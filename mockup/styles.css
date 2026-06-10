@@ -1,0 +1,292 @@
+/* =========================================================
+   MartCart · 공통 디자인 토큰 + 공통 컴포넌트
+   index.html, camera.html (및 향후 모든 화면)이 공유
+   ========================================================= */
+
+:root{
+  /* Surfaces */
+  --bg:#F2F4F7;
+  --surface:#FFFFFF;
+  --surface-2:#FAFBFC;
+
+  /* Brand */
+  --primary:#1E3A5F;
+  --primary-2:#264F80;
+  --accent:#00A968;
+  --accent-2:#00D080;
+  --accent-bg:#E7F8EF;
+  --accent-bg-2:#D1FAE5;
+  --accent-dark:#047857;
+
+  /* Text */
+  --text:#0F172A;
+  --muted:#6B7280;
+  --muted-2:#9CA3AF;
+
+  /* Lines */
+  --divider:#E5E7EB;
+  --divider-soft:#F1F5F9;
+
+  /* States */
+  --danger:#DC2626;
+  --warn:#F59E0B;
+  --warn-bg:#FEF3C7;
+  --warn-bg-2:#FFFBEB;
+  --warn-text:#92400E;
+
+  /* Elevation */
+  --shadow-card:0 2px 6px rgba(10,31,51,.06), 0 1px 2px rgba(10,31,51,.04);
+  --shadow-hero:0 6px 18px rgba(10,31,51,.08), 0 2px 6px rgba(10,31,51,.05);
+  --shadow-btn:0 4px 12px rgba(30,58,95,.28);
+  --shadow-btn-lg:0 6px 14px rgba(30,58,95,.3);
+
+  /* Gradients */
+  --grad-hero:linear-gradient(180deg, var(--surface), var(--surface-2));
+  --grad-primary:linear-gradient(180deg, var(--primary-2), var(--primary));
+  --grad-progress:linear-gradient(90deg, var(--accent), var(--accent-2));
+  --grad-banner:linear-gradient(180deg, var(--warn-bg-2), var(--warn-bg));
+
+  /* Radii */
+  --r-card:18px;
+  --r-hero:20px;
+  --r-btn:14px;
+  --r-chip:11px;
+}
+
+/* Base */
+*{box-sizing:border-box; -webkit-tap-highlight-color:transparent}
+html,body{
+  margin:0; padding:0;
+  font-family:Pretendard,-apple-system,'Segoe UI','Apple SD Gothic Neo','Malgun Gothic',sans-serif;
+  color:var(--text);
+}
+body{
+  display:flex; justify-content:center; align-items:flex-start;
+  min-height:100vh; padding:24px 16px;
+  background:#E5E7EB;
+}
+body.dark{background:#1F2937}
+
+/* =========================================================
+   Device frame (iPhone-like, 390x844)
+   ========================================================= */
+.device{
+  position:relative; width:390px; height:844px;
+  background:var(--bg);
+  border-radius:48px; overflow:hidden;
+  box-shadow:
+    0 24px 60px rgba(15,23,42,.25),
+    0 0 0 12px #0F172A,
+    0 0 0 13px #1F2937;
+  user-select:none;
+}
+.device.dark{background:#0A0F18}
+
+/* Dynamic island */
+.island{
+  position:absolute; top:11px; left:50%; transform:translateX(-50%);
+  width:118px; height:34px; background:#000; border-radius:20px; z-index:30;
+}
+
+/* Home indicator (light/dark variants) */
+.home-indicator{
+  position:absolute; bottom:8px; left:50%; transform:translateX(-50%);
+  width:134px; height:5px; border-radius:3px;
+  background:#0F172A; opacity:.4; z-index:35;
+}
+.home-indicator.light{background:#fff}
+
+/* =========================================================
+   Status bar (light = dark text, dark = white text)
+   ========================================================= */
+.statusbar{
+  position:absolute; top:0; left:0; right:0; height:50px;
+  display:flex; align-items:center; padding:0 32px;
+  font-size:15px; font-weight:600;
+  color:var(--text); z-index:20; pointer-events:none;
+}
+.statusbar.on-dark{color:#fff}
+.statusbar .right{margin-left:auto; display:flex; align-items:center; gap:6px}
+.statusbar .bars{display:flex; gap:2px; align-items:end}
+.statusbar .bars span{display:block; width:3px; background:currentColor; border-radius:1px}
+.statusbar .bars span:nth-child(1){height:5px}
+.statusbar .bars span:nth-child(2){height:7px}
+.statusbar .bars span:nth-child(3){height:9px}
+.statusbar .bars span:nth-child(4){height:11px}
+.statusbar .battery{
+  width:24px; height:12px; border:1.2px solid currentColor; border-radius:3px;
+  padding:1.5px; position:relative;
+}
+.statusbar .battery::after{
+  content:""; position:absolute; right:-3px; top:3px;
+  width:2px; height:6px; background:currentColor; border-radius:1px;
+}
+.statusbar .battery i{display:block; width:80%; height:100%; background:currentColor; border-radius:1.5px}
+
+/* =========================================================
+   Buttons
+   ========================================================= */
+.btn{
+  height:56px; border-radius:var(--r-btn);
+  display:flex; align-items:center; justify-content:center; gap:8px;
+  font-size:15px; font-weight:700;
+  cursor:pointer; transition:transform .08s;
+  border:none;
+}
+.btn:active{transform:scale(.98)}
+.btn-secondary{background:#fff; border:1.5px solid var(--primary); color:var(--primary)}
+.btn-primary{background:var(--grad-primary); color:#fff; box-shadow:var(--shadow-btn)}
+.btn-ghost{background:transparent; border:1.5px solid var(--divider); color:var(--muted)}
+.btn svg{width:20px; height:20px}
+
+/* Small icon button (e.g. camera top bar) */
+.icon-btn{
+  width:38px; height:38px; border-radius:50%;
+  background:rgba(0,0,0,.45); backdrop-filter:blur(8px);
+  display:flex; align-items:center; justify-content:center;
+  color:#fff; cursor:pointer; transition:background .15s;
+}
+.icon-btn:active{background:rgba(0,0,0,.7)}
+.icon-btn svg{width:20px; height:20px}
+
+/* =========================================================
+   Toast (bottom)
+   ========================================================= */
+.toast{
+  position:absolute; left:50%; bottom:108px;
+  transform:translateX(-50%) translateY(120px);
+  background:#0F172A; color:#fff;
+  padding:14px 18px; border-radius:14px;
+  font-size:13px; font-weight:600; max-width:80%;
+  display:flex; align-items:center; gap:12px;
+  z-index:60; opacity:0; pointer-events:none;
+  transition:transform .25s, opacity .25s;
+}
+.toast.show{transform:translateX(-50%) translateY(0); opacity:1}
+.toast .undo{color:var(--accent-2); font-weight:700; cursor:pointer}
+.toast svg{width:18px; height:18px; flex-shrink:0; color:var(--accent-2)}
+
+/* =========================================================
+   App bar (white surface, sticky-style)
+   ========================================================= */
+.appbar{
+  position:absolute; top:50px; left:0; right:0; height:60px;
+  background:#fff; padding:14px 24px; z-index:15;
+  display:flex; align-items:center; gap:8px;
+  border-bottom:1px solid rgba(229,231,235,.6);
+}
+.appbar .meta{display:flex; flex-direction:column}
+.appbar .meta small{font-size:12px; color:var(--muted); line-height:1}
+.appbar .meta .title{
+  font-size:18px; font-weight:700; line-height:1.2; margin-top:4px;
+  display:flex; align-items:center; gap:4px;
+}
+.appbar .live{display:flex; align-items:center; gap:5px; margin-left:8px; align-self:flex-end; padding-bottom:2px}
+.appbar .live .dot{
+  width:7px; height:7px; border-radius:50%; background:var(--accent);
+  animation:pulse 1.6s ease-in-out infinite;
+}
+.appbar .live span{font-size:11px; font-weight:600; color:var(--accent)}
+.appbar .more{margin-left:auto; width:28px; height:40px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px; cursor:pointer}
+.appbar .more i{width:4px; height:4px; border-radius:50%; background:var(--muted)}
+
+@keyframes pulse{0%,100%{opacity:1; transform:scale(1)} 50%{opacity:.4; transform:scale(.85)}}
+
+/* =========================================================
+   Caption (below device, floating)
+   ========================================================= */
+.caption{
+  position:fixed; bottom:12px; left:50%; transform:translateX(-50%);
+  font-family:Pretendard,sans-serif; font-size:12px; color:var(--muted);
+  background:#fff; padding:6px 14px; border-radius:99px;
+  box-shadow:0 2px 8px rgba(0,0,0,.06);
+}
+.caption.on-dark{background:rgba(0,0,0,.5); color:#9CA3AF}
+.caption a{color:var(--primary); text-decoration:none; margin:0 4px; font-weight:600}
+.caption.on-dark a{color:#fff}
+
+/* =========================================================
+   Bottom Sheet (modal that slides up from bottom)
+   ========================================================= */
+.backdrop{
+  position:absolute; inset:0; background:rgba(0,0,0,.5);
+  opacity:0; pointer-events:none; transition:opacity .25s; z-index:40;
+}
+.backdrop.show{opacity:1; pointer-events:auto}
+
+.sheet{
+  position:absolute; left:0; right:0; bottom:0; background:#fff;
+  border-radius:24px 24px 0 0;
+  transform:translateY(100%);
+  transition:transform .35s cubic-bezier(.2,.8,.2,1);
+  z-index:45; max-height:78%;
+  display:flex; flex-direction:column;
+}
+.sheet.show{transform:translateY(0)}
+.sheet .handle{
+  width:36px; height:5px; background:#D1D5DB; border-radius:3px;
+  margin:10px auto 6px;
+}
+.sheet .header{
+  display:flex; justify-content:space-between; align-items:center;
+  padding:10px 24px 6px;
+}
+.sheet .header h3{margin:0; font-size:18px; font-weight:700}
+.sheet .header .action{
+  font-size:13px; font-weight:700; color:var(--primary);
+  cursor:pointer; padding:6px 4px;
+}
+.sheet .body{padding:14px 20px 12px; overflow-y:auto}
+.sheet .body::-webkit-scrollbar{width:0}
+.sheet .footer{
+  padding:14px 20px 20px; border-top:1px solid var(--divider);
+  display:flex; gap:10px; flex-shrink:0;
+}
+
+/* =========================================================
+   Quantity stepper
+   ========================================================= */
+.stepper{
+  display:inline-flex; align-items:center; gap:0;
+  background:#F7F8FA; border-radius:12px; padding:4px;
+}
+.stepper button{
+  width:36px; height:36px; border-radius:8px; border:none; background:transparent;
+  font-size:18px; font-weight:700; color:var(--primary); cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+  transition:background .15s;
+}
+.stepper button:active{background:var(--divider)}
+.stepper button:disabled{color:var(--muted-2); cursor:not-allowed}
+.stepper .val{
+  min-width:48px; text-align:center; font-size:17px; font-weight:700;
+  font-feature-settings:'tnum';
+}
+
+/* =========================================================
+   Bottom tab bar (4 tabs, 80dp height)
+   ========================================================= */
+.tabbar{
+  position:absolute; left:0; right:0; bottom:0; height:80px;
+  background:#fff; border-top:1px solid var(--divider);
+  display:flex; z-index:15;
+}
+.tabbar .tab{
+  flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:4px; cursor:pointer; color:var(--muted);
+  transition:color .15s; padding-top:8px;
+  text-decoration:none;
+}
+.tabbar .tab svg{width:22px; height:22px; transition:transform .15s}
+.tabbar .tab .lbl{font-size:11px; font-weight:600}
+.tabbar .tab:active svg{transform:scale(.9)}
+.tabbar .tab.active{color:var(--primary)}
+.tabbar .tab.active .lbl{font-weight:700}
+
+/* =========================================================
+   Utility
+   ========================================================= */
+.tnum{font-feature-settings:'tnum'}
+.strike{text-decoration:line-through}
+.scrollable{overflow-y:auto; -webkit-overflow-scrolling:touch}
+.scrollable::-webkit-scrollbar{width:0}

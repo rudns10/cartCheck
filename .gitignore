@@ -1,0 +1,63 @@
+# ===== SECRETS — never commit =====
+*.keystore
+*.jks
+*.p12
+*.pfx
+*.snk
+keystore.properties
+*.env
+.env.*
+
+# ===== Build outputs =====
+[Bb]in/
+[Oo]bj/
+[Oo]ut/
+[Bb]uild/
+[Pp]ublish/
+[Dd]ebug/
+[Rr]elease/
+**/MSBuild_Logs/
+**/[Bb]in/
+**/[Oo]bj/
+
+# ===== IDE =====
+.vs/
+.vscode/*
+!.vscode/settings.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.idea/
+*.suo
+*.user
+*.userprefs
+
+# ===== Logs =====
+*.log
+**/logs/
+*.tlog
+
+# ===== NuGet =====
+*.nupkg
+*.snupkg
+packages/
+**/packages/
+.nuget/
+
+# ===== Android build artifacts (MAUI) =====
+**/*.apk
+**/*.aab
+**/*.idsig
+**/*-Signed.zip
+
+# ===== Test results =====
+[Tt]est[Rr]esult*/
+*.trx
+*.coverage
+
+# ===== OS junk =====
+Thumbs.db
+.DS_Store
+desktop.ini
+
+# ===== Claude session =====
+.claude/

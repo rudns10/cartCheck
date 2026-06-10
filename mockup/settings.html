@@ -1,0 +1,387 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+<title>MartCart · 설정</title>
+<link rel="preconnect" href="https://cdn.jsdelivr.net"/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css"/>
+<link rel="stylesheet" href="styles.css"/>
+<style>
+  /* ===== Top bar ===== */
+  .topbar{
+    position:absolute; top:50px; left:0; right:0; height:64px;
+    padding:14px 20px; display:flex; align-items:center; z-index:15;
+  }
+  .topbar h1{margin:0; font-size:22px; font-weight:800; letter-spacing:-.4px}
+
+  /* ===== Scroll area ===== */
+  .scroll{position:absolute; top:114px; left:0; right:0; bottom:80px; overflow-y:auto; -webkit-overflow-scrolling:touch; padding:4px 0 24px}
+  .scroll::-webkit-scrollbar{width:0}
+
+  /* ===== Profile card ===== */
+  .profile{
+    margin:6px 16px 14px; padding:18px 20px;
+    background:linear-gradient(135deg, var(--primary-2), var(--primary));
+    color:#fff; border-radius:18px;
+    display:flex; align-items:center; gap:14px;
+    box-shadow:0 8px 20px rgba(15,42,80,.25);
+    position:relative; overflow:hidden;
+  }
+  .profile::before{
+    content:""; position:absolute; right:-30px; top:-30px;
+    width:120px; height:120px; border-radius:50%; background:rgba(255,255,255,.08);
+  }
+  .profile .avatar{
+    width:48px; height:48px; border-radius:50%;
+    background:rgba(255,255,255,.18);
+    display:flex; align-items:center; justify-content:center;
+    font-size:22px; flex-shrink:0;
+  }
+  .profile .info{flex:1; position:relative}
+  .profile .info b{display:block; font-size:15px; font-weight:700}
+  .profile .info small{display:block; font-size:11px; opacity:.8; margin-top:3px}
+  .profile .stats{
+    display:flex; gap:18px; margin-top:8px;
+    font-size:11px; opacity:.9; font-weight:600;
+    font-feature-settings:'tnum';
+  }
+  .profile .stats b{font-weight:800; color:var(--accent-2)}
+
+  /* ===== Section header ===== */
+  .sect-head{
+    padding:18px 24px 8px;
+    font-size:12px; font-weight:700; color:var(--muted);
+    letter-spacing:.4px; text-transform:uppercase;
+  }
+
+  /* ===== Setting group card ===== */
+  .group{
+    margin:0 16px; background:#fff;
+    border-radius:14px; overflow:hidden;
+    box-shadow:var(--shadow-card);
+  }
+  .row{
+    display:flex; align-items:center; gap:14px;
+    padding:14px 18px; cursor:pointer;
+    transition:background .15s;
+    min-height:54px;
+  }
+  .row:not(:last-child){border-bottom:1px solid var(--divider-soft)}
+  .row:active{background:#F8FAFC}
+  .row .ic{
+    width:32px; height:32px; border-radius:9px;
+    background:#EEF2F7; color:var(--primary);
+    display:flex; align-items:center; justify-content:center;
+    flex-shrink:0;
+  }
+  .row .ic.warn{background:#FEF3C7; color:var(--warn-text)}
+  .row .ic.danger{background:#FEE2E2; color:var(--danger)}
+  .row .ic.green{background:#D1FAE5; color:var(--accent-dark)}
+  .row .ic svg{width:18px; height:18px}
+  .row .label{flex:1; min-width:0}
+  .row .label .t{font-size:14px; font-weight:600}
+  .row .label .s{font-size:11px; color:var(--muted); margin-top:2px; line-height:1.3}
+  .row .value{font-size:13px; color:var(--muted); font-weight:600}
+  .row .arrow{color:var(--muted-2)}
+  .row .badge-soft{
+    background:#EEF2F7; color:var(--primary);
+    padding:3px 9px; border-radius:99px;
+    font-size:10px; font-weight:700;
+  }
+  .row .badge-soft.green{background:var(--accent-bg); color:var(--accent-dark)}
+
+  /* ===== Toggle switch ===== */
+  .toggle{
+    width:46px; height:28px; border-radius:99px;
+    background:#E5E7EB; position:relative;
+    cursor:pointer; transition:background .2s;
+    flex-shrink:0;
+  }
+  .toggle::after{
+    content:""; position:absolute; top:3px; left:3px;
+    width:22px; height:22px; border-radius:50%;
+    background:#fff; box-shadow:0 2px 4px rgba(0,0,0,.15);
+    transition:transform .2s;
+  }
+  .toggle.on{background:var(--accent)}
+  .toggle.on::after{transform:translateX(18px)}
+  .toggle.dim{opacity:.4; pointer-events:none}
+
+  /* ===== Mart chip in list row ===== */
+  .mart-chips{display:flex; gap:5px; flex-wrap:wrap; max-width:200px; justify-content:flex-end}
+  .mart-chips .chip{
+    background:#F1F5F9; color:var(--text);
+    padding:3px 9px; border-radius:99px;
+    font-size:10px; font-weight:700;
+  }
+
+  /* ===== Danger row ===== */
+  .row.danger-row .label .t{color:var(--danger)}
+
+  /* ===== Version footer ===== */
+  .version{
+    text-align:center; padding:24px 0 8px;
+    font-size:11px; color:var(--muted-2);
+    line-height:1.6;
+  }
+  .version b{color:var(--muted); font-weight:700}
+  .version .dots{margin:0 6px; color:var(--divider)}
+</style>
+</head>
+<body>
+
+<div class="device">
+
+  <div class="statusbar">
+    <span>9:41</span>
+    <div class="right">
+      <div class="bars"><span></span><span></span><span></span><span></span></div>
+      <div class="battery"><i></i></div>
+    </div>
+  </div>
+  <div class="island"></div>
+
+  <div class="topbar">
+    <h1>설정</h1>
+  </div>
+
+  <div class="scroll">
+
+    <!-- Profile -->
+    <div class="profile">
+      <div class="avatar">👤</div>
+      <div class="info">
+        <b>로컬 사용자</b>
+        <small>2026년 3월 12일부터 MartCart 사용 중</small>
+        <div class="stats">
+          <span>총 <b>23</b>회 장보기</span>
+          <span>누적 절약 <b>67,400원</b></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== 보안 ===== -->
+    <div class="sect-head">보안</div>
+    <div class="group">
+      <div class="row" onclick="alert('PIN 변경 화면 (미구현)')">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
+        <div class="label">
+          <div class="t">PIN 변경</div>
+          <div class="s">6자리 숫자 · 마지막 변경 5월 12일</div>
+        </div>
+        <span class="arrow">›</span>
+      </div>
+      <div class="row" onclick="cycleLockTime()">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></div>
+        <div class="label">
+          <div class="t">자동 잠금</div>
+          <div class="s">백그라운드 진입 후 일정 시간 경과 시</div>
+        </div>
+        <span class="value" id="lockTime">5분</span>
+        <span class="arrow">›</span>
+      </div>
+      <div class="row" onclick="toggleBio(this)">
+        <div class="ic green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12a10 10 0 0 1 18-6"/><path d="M22 12a10 10 0 0 1-18 6"/><circle cx="12" cy="12" r="3"/></svg></div>
+        <div class="label">
+          <div class="t">생체 인증</div>
+          <div class="s">지문 / Face ID로 빠른 잠금 해제</div>
+        </div>
+        <div class="toggle" id="bio"></div>
+      </div>
+    </div>
+
+    <!-- ===== 마트 관리 ===== -->
+    <div class="sect-head">마트 관리</div>
+    <div class="group">
+      <div class="row" onclick="alert('마트 목록 화면 (미구현)')">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9h18l-2 11H5z"/><path d="M16 9V5a4 4 0 0 0-8 0v4"/></svg></div>
+        <div class="label">
+          <div class="t">등록된 마트</div>
+          <div class="s">기본 임계치 · 할인 금액 관리</div>
+        </div>
+        <div class="mart-chips">
+          <span class="chip">이마트</span>
+          <span class="chip">코스트코</span>
+          <span class="chip">+3</span>
+        </div>
+        <span class="arrow">›</span>
+      </div>
+      <div class="row" onclick="alert('마트 추가 (미구현)')">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></div>
+        <div class="label">
+          <div class="t">마트 추가</div>
+          <div class="s">새 마트와 임계치 등록</div>
+        </div>
+        <span class="arrow">›</span>
+      </div>
+    </div>
+
+    <!-- ===== AI 보조 (§16) ===== -->
+    <div class="sect-head">AI 보조</div>
+    <div class="group">
+      <div class="row" onclick="toggleNano(this)">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><circle cx="12" cy="12" r="3"/></svg></div>
+        <div class="label">
+          <div class="t">Gemini Nano <span class="badge-soft green">기본</span></div>
+          <div class="s">온디바이스 · 가격 분류·OCR 보정 (Android 지원 기기)</div>
+        </div>
+        <div class="toggle on" id="nano"></div>
+      </div>
+      <div class="row" onclick="toggleApi(this)">
+        <div class="ic warn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/></svg></div>
+        <div class="label">
+          <div class="t">Gemini API (클라우드) <span class="badge-soft">옵트인</span></div>
+          <div class="s">소비 인사이트 생성용 · 네트워크 사용</div>
+        </div>
+        <div class="toggle" id="api"></div>
+      </div>
+      <div class="row" onclick="alert('AI 작동 상세 (미구현)')">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg></div>
+        <div class="label">
+          <div class="t">AI 작동 방식</div>
+          <div class="s">무엇을 처리하고, 무엇은 처리하지 않는지</div>
+        </div>
+        <span class="arrow">›</span>
+      </div>
+    </div>
+
+    <!-- ===== 데이터 ===== -->
+    <div class="sect-head">데이터</div>
+    <div class="group">
+      <div class="row" onclick="alert('백업 내보내기 (미구현)')">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></div>
+        <div class="label">
+          <div class="t">백업 내보내기</div>
+          <div class="s">SQLite 파일로 저장 · 마지막 백업 5월 1일</div>
+        </div>
+        <span class="arrow">›</span>
+      </div>
+      <div class="row" onclick="alert('백업 가져오기 (미구현)')">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></div>
+        <div class="label">
+          <div class="t">복원하기</div>
+          <div class="s">백업 파일에서 데이터 가져오기</div>
+        </div>
+        <span class="arrow">›</span>
+      </div>
+      <div class="row" onclick="toast('저장 공간 분석은 미구현')">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14a9 3 0 0 0 18 0V5"/><path d="M3 12a9 3 0 0 0 18 0"/></svg></div>
+        <div class="label">
+          <div class="t">저장 공간</div>
+          <div class="s">장바구니 23건 · 항목 187건</div>
+        </div>
+        <span class="value">2.4 MB</span>
+      </div>
+    </div>
+
+    <!-- ===== 앱 ===== -->
+    <div class="sect-head">앱</div>
+    <div class="group">
+      <div class="row" onclick="alert('피드백 (미구현)')">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
+        <div class="label">
+          <div class="t">피드백 보내기</div>
+          <div class="s">버그 신고 · 기능 제안</div>
+        </div>
+        <span class="arrow">›</span>
+      </div>
+      <div class="row" onclick="alert('오픈소스 라이선스 (미구현)')">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+        <div class="label">
+          <div class="t">오픈소스 라이선스</div>
+        </div>
+        <span class="arrow">›</span>
+      </div>
+      <div class="row" onclick="alert('개인정보 처리방침 (미구현)')">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+        <div class="label">
+          <div class="t">개인정보 처리방침</div>
+          <div class="s">오프라인 우선 · 데이터는 기기에만</div>
+        </div>
+        <span class="arrow">›</span>
+      </div>
+    </div>
+
+    <!-- ===== Danger ===== -->
+    <div class="sect-head">위험 영역</div>
+    <div class="group">
+      <div class="row danger-row" onclick="confirm('모든 데이터를 영구 삭제할까요?') && toast('전체 삭제 (mock)')">
+        <div class="ic danger"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg></div>
+        <div class="label">
+          <div class="t">모든 데이터 삭제</div>
+          <div class="s">장바구니 · 마트 · 설정 모두 영구 삭제됩니다</div>
+        </div>
+        <span class="arrow">›</span>
+      </div>
+    </div>
+
+    <div class="version">
+      <b>MartCart</b> v0.1.0 (build 142)
+      <div>
+        <span class="dots">·</span>설계 v0.1<span class="dots">·</span>.NET MAUI 9.0<span class="dots">·</span>
+      </div>
+      <div style="margin-top:4px">© 2026 MartCart · 한국어</div>
+    </div>
+
+  </div>
+
+  <!-- Tab bar -->
+  <div class="tabbar">
+    <a class="tab" href="home.html">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3 2 12h3v8h5v-6h4v6h5v-8h3z"/></svg>
+      <span class="lbl">홈</span>
+    </a>
+    <a class="tab" href="history.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3" stroke-linecap="round"/></svg>
+      <span class="lbl">기록</span>
+    </a>
+    <a class="tab" href="stats.html">
+      <svg viewBox="0 0 24 24" fill="currentColor"><rect x="4" y="12" width="4" height="9" rx="1"/><rect x="10" y="6" width="4" height="15" rx="1"/><rect x="16" y="9" width="4" height="12" rx="1"/></svg>
+      <span class="lbl">통계</span>
+    </a>
+    <a class="tab active" href="settings.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h0a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h0a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v0a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      <span class="lbl">설정</span>
+    </a>
+  </div>
+
+  <div class="toast" id="toast"><span id="toastMsg">메시지</span></div>
+
+  <div class="home-indicator"></div>
+</div>
+
+<div class="caption">토글 탭으로 옵션 켜고 끄기 · 자동잠금 탭으로 순환 · <a href="home.html">홈</a></div>
+
+<script>
+  function toggleSwitch(el){ el.classList.toggle('on'); }
+  function toggleBio(row){ toggleSwitch(row.querySelector('.toggle')); }
+  function toggleNano(row){
+    const t = row.querySelector('.toggle');
+    toggleSwitch(t);
+    // If Nano off, API toggle becomes more relevant (no behavior change, just visual hint)
+  }
+  function toggleApi(row){
+    const t = row.querySelector('.toggle');
+    toggleSwitch(t);
+    if (t.classList.contains('on')) toast('네트워크를 사용합니다. 매니페스트 권한 활성화');
+  }
+
+  const lockTimes = ['1분', '5분', '15분', '1시간', '안 함'];
+  let lockIdx = 1;
+  function cycleLockTime(){
+    lockIdx = (lockIdx + 1) % lockTimes.length;
+    document.getElementById('lockTime').textContent = lockTimes[lockIdx];
+  }
+
+  let toastTimer;
+  function toast(msg){
+    const t = document.getElementById('toast');
+    document.getElementById('toastMsg').textContent = msg;
+    t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(()=> t.classList.remove('show'), 2200);
+  }
+</script>
+</body>
+</html>

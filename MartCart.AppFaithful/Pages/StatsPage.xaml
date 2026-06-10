@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:controls="clr-namespace:MartCart.AppFaithful.Controls"
+             x:Class="MartCart.AppFaithful.Pages.StatsPage"
+             BackgroundColor="{StaticResource BgColor}">
+
+    <Grid RowDefinitions="Auto,*,Auto">
+
+        <!-- ===== Top bar ===== -->
+        <Grid Grid.Row="0" Padding="20,18,20,12">
+            <Label Text="통계" FontSize="22" FontAttributes="Bold" TextColor="{StaticResource TextColor}"/>
+        </Grid>
+
+        <ScrollView Grid.Row="1" Padding="0,0,0,24">
+            <VerticalStackLayout Spacing="0">
+
+                <!-- ===== Period chips ===== -->
+                <ScrollView Orientation="Horizontal" HorizontalScrollBarVisibility="Never" Margin="0,4,0,4">
+                    <HorizontalStackLayout Spacing="8" Padding="16,2">
+                        <Border x:Name="PeriodMonth" Stroke="Transparent" Background="{StaticResource PrimaryColor}" StrokeShape="RoundRectangle 99" Padding="16,9">
+                            <Label Text="이번 달" FontSize="13" FontAttributes="Bold" TextColor="White"/>
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnPeriodTapped" CommandParameter="thismonth"/>
+                            </Border.GestureRecognizers>
+                        </Border>
+                        <Border x:Name="PeriodLast" Stroke="{StaticResource DividerColor}" StrokeThickness="1" Background="{StaticResource SurfaceColor}" StrokeShape="RoundRectangle 99" Padding="16,9">
+                            <Label Text="지난 달" FontSize="13" FontAttributes="Bold" TextColor="{StaticResource MutedColor}"/>
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnPeriodTapped" CommandParameter="lastmonth"/>
+                            </Border.GestureRecognizers>
+                        </Border>
+                        <Border x:Name="Period3M" Stroke="{StaticResource DividerColor}" StrokeThickness="1" Background="{StaticResource SurfaceColor}" StrokeShape="RoundRectangle 99" Padding="16,9">
+                            <Label Text="최근 3개월" FontSize="13" FontAttributes="Bold" TextColor="{StaticResource MutedColor}"/>
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnPeriodTapped" CommandParameter="3months"/>
+                            </Border.GestureRecognizers>
+                        </Border>
+                    </HorizontalStackLayout>
+                </ScrollView>
+
+                <!-- ===== Saved hero (green gradient) ===== -->
+                <Border Margin="16,10,16,0" Stroke="Transparent" StrokeShape="RoundRectangle 22" Padding="22">
+                    <Border.Background>
+                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                            <GradientStop Color="#00A968" Offset="0"/>
+                            <GradientStop Color="#00D080" Offset="0.6"/>
+                            <GradientStop Color="#4ADE80" Offset="1"/>
+                        </LinearGradientBrush>
+                    </Border.Background>
+                    <Border.Shadow>
+                        <Shadow Brush="#00A968" Offset="0,10" Radius="20" Opacity="0.28"/>
+                    </Border.Shadow>
+                    <VerticalStackLayout Spacing="0">
+                        <Label x:Name="SavedHeroLabel" Text="이번 달 총 절약액" FontSize="12" FontAttributes="Bold" TextColor="White" Opacity="0.85" CharacterSpacing="0.5"/>
+                        <HorizontalStackLayout Spacing="3" Margin="0,4,0,0">
+                            <Label x:Name="SavedAmountLabel" Text="12,400" FontSize="38" FontAttributes="Bold" TextColor="White" LineHeight="1"/>
+                            <Label Text="원" FontSize="18" FontAttributes="Bold" TextColor="White" Opacity="0.85" VerticalOptions="End" Margin="0,0,0,4"/>
+                        </HorizontalStackLayout>
+                        <Label x:Name="SavedSubLabel" Text="정상가 대비 7.4% 할인받으셨어요" FontSize="12" TextColor="White" Opacity="0.85" Margin="0,6,0,0"/>
+                        <Border x:Name="SavedPillBorder" Stroke="Transparent" Background="#33FFFFFF" StrokeShape="RoundRectangle 99" Padding="11,5" HorizontalOptions="Start" Margin="0,14,0,0">
+                            <Label x:Name="SavedPill" Text="↗ 지난 달보다 2,800원 더 절약" FontSize="11" FontAttributes="Bold" TextColor="White"/>
+                        </Border>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- ===== Metric grid (1×2) ===== -->
+                <Grid Padding="16,12,16,0" ColumnDefinitions="*,*" RowDefinitions="Auto" ColumnSpacing="10">
+
+                    <Border Grid.Column="0" Grid.Row="0" Stroke="Transparent" Background="{StaticResource SurfaceColor}" StrokeShape="RoundRectangle 18" Padding="16">
+                        <Border.Shadow>
+                            <Shadow Brush="#0A1F33" Offset="0,2" Radius="6" Opacity="0.06"/>
+                        </Border.Shadow>
+                        <Grid RowDefinitions="Auto,*" RowSpacing="8">
+                            <HorizontalStackLayout Grid.Row="0" Spacing="6">
+                                <Border Stroke="Transparent" Background="#EEF2F7" StrokeShape="RoundRectangle 7" WidthRequest="24" HeightRequest="24">
+                                    <Label Text="₩" FontSize="11" FontAttributes="Bold" TextColor="{StaticResource PrimaryColor}" HorizontalOptions="Center" VerticalOptions="Center"/>
+                                </Border>
+                                <Label Text="실 구매" FontSize="12" FontAttributes="Bold" TextColor="{StaticResource MutedColor}" VerticalOptions="Center"/>
+                            </HorizontalStackLayout>
+                            <VerticalStackLayout Grid.Row="1" Spacing="6" VerticalOptions="End">
+                                <HorizontalStackLayout Spacing="2" VerticalOptions="End">
+                                    <Label x:Name="MetricSpentLabel" Text="156,200" FontSize="22" FontAttributes="Bold" TextColor="{StaticResource TextColor}" LineHeight="1"/>
+                                    <Label Text="원" FontSize="13" FontAttributes="Bold" TextColor="{StaticResource MutedColor}" VerticalOptions="End" Margin="0,0,0,2"/>
+                                </HorizontalStackLayout>
+                                <HorizontalStackLayout Spacing="4">
+                                    <Label x:Name="MetricSpentTrendLabel" Text="▼ 8%" FontSize="11" FontAttributes="Bold" TextColor="{StaticResource DangerColor}"/>
+                                    <Label Text="전월 대비" FontSize="11" TextColor="{StaticResource MutedColor}"/>
+                                </HorizontalStackLayout>
+                            </VerticalStackLayout>
+                        </Grid>
+                    </Border>
+
+                    <Border Grid.Column="1" Grid.Row="0" Stroke="Transparent" Background="{StaticResource SurfaceColor}" StrokeShape="RoundRectangle 18" Padding="16">
+                        <Border.Shadow>
+                            <Shadow Brush="#0A1F33" Offset="0,2" Radius="6" Opacity="0.06"/>
+                        </Border.Shadow>
+                        <Grid RowDefinitions="Auto,*" RowSpacing="8">
+                            <HorizontalStackLayout Grid.Row="0" Spacing="6">
+                                <Border Stroke="Transparent" Background="#EEF2F7" StrokeShape="RoundRectangle 7" WidthRequest="24" HeightRequest="24">
+                                    <Label Text="🛒" FontSize="13" HorizontalOptions="Center" VerticalOptions="Center"/>
+                                </Border>
+                                <Label Text="장보기" FontSize="12" FontAttributes="Bold" TextColor="{StaticResource MutedColor}" VerticalOptions="Center"/>
+                            </HorizontalStackLayout>
+                            <VerticalStackLayout Grid.Row="1" Spacing="6" VerticalOptions="End">
+                                <HorizontalStackLayout Spacing="2" VerticalOptions="End">
+                                    <Label x:Name="MetricCountLabel" Text="5" FontSize="22" FontAttributes="Bold" TextColor="{StaticResource TextColor}" LineHeight="1"/>
+                                    <Label Text="회" FontSize="13" FontAttributes="Bold" TextColor="{StaticResource MutedColor}" VerticalOptions="End" Margin="0,0,0,2"/>
+                                </HorizontalStackLayout>
+                                <Label x:Name="MetricGapLabel" FontSize="11" TextColor="{StaticResource MutedColor}">
+                                    <Label.FormattedText>
+                                        <FormattedString>
+                                            <Span Text="평균 "/>
+                                            <Span Text="6.2일" FontAttributes="Bold" TextColor="{StaticResource TextColor}"/>
+                                            <Span Text=" 간격"/>
+                                        </FormattedString>
+                                    </Label.FormattedText>
+                                </Label>
+                            </VerticalStackLayout>
+                        </Grid>
+                    </Border>
+
+                </Grid>
+
+                <!-- ===== Daily trend ===== -->
+                <Grid Padding="24,22,24,8" ColumnDefinitions="*,Auto">
+                    <Label Grid.Column="0" Text="주간 지출 추이" FontSize="14" FontAttributes="Bold" TextColor="{StaticResource TextColor}"/>
+                    <Label Grid.Column="1" x:Name="TrendSubLabel" Text="최근 7일" FontSize="11" TextColor="{StaticResource MutedColor}" VerticalOptions="Center"/>
+                </Grid>
+
+                <Border Margin="16,0" Background="{StaticResource SurfaceColor}" Stroke="Transparent" StrokeShape="RoundRectangle 18" Padding="18,16,18,12">
+                    <Border.Shadow>
+                        <Shadow Brush="#0A1F33" Offset="0,2" Radius="6" Opacity="0.06"/>
+                    </Border.Shadow>
+                    <VerticalStackLayout Spacing="8">
+                        <Grid ColumnDefinitions="*,*,*,*,*,*,*" ColumnSpacing="6" HeightRequest="96">
+                            <Border Grid.Column="0" x:Name="Bar0" Stroke="Transparent" Background="{StaticResource DividerColor}" StrokeShape="RoundRectangle 4,4,2,2" HeightRequest="6" VerticalOptions="End"/>
+                            <Border Grid.Column="1" x:Name="Bar1" Stroke="Transparent" Background="{StaticResource DividerColor}" StrokeShape="RoundRectangle 4,4,2,2" HeightRequest="6" VerticalOptions="End"/>
+                            <Border Grid.Column="2" x:Name="Bar2" Stroke="Transparent" Background="{StaticResource DividerColor}" StrokeShape="RoundRectangle 4,4,2,2" HeightRequest="6" VerticalOptions="End"/>
+                            <Border Grid.Column="3" x:Name="Bar3" Stroke="Transparent" Background="{StaticResource DividerColor}" StrokeShape="RoundRectangle 4,4,2,2" HeightRequest="6" VerticalOptions="End"/>
+                            <Border Grid.Column="4" x:Name="Bar4" Stroke="Transparent" Background="{StaticResource DividerColor}" StrokeShape="RoundRectangle 4,4,2,2" HeightRequest="6" VerticalOptions="End"/>
+                            <Border Grid.Column="5" x:Name="Bar5" Stroke="Transparent" Background="{StaticResource DividerColor}" StrokeShape="RoundRectangle 4,4,2,2" HeightRequest="6" VerticalOptions="End"/>
+                            <Border Grid.Column="6" x:Name="Bar6" Stroke="Transparent" Background="{StaticResource DividerColor}" StrokeShape="RoundRectangle 4,4,2,2" HeightRequest="6" VerticalOptions="End"/>
+                        </Grid>
+                        <Grid ColumnDefinitions="*,*,*,*,*,*,*" ColumnSpacing="6">
+                            <Label Grid.Column="0" x:Name="Day0Label" Text="" FontSize="10" TextColor="{StaticResource Muted2Color}" HorizontalOptions="Center"/>
+                            <Label Grid.Column="1" x:Name="Day1Label" Text="" FontSize="10" TextColor="{StaticResource Muted2Color}" HorizontalOptions="Center"/>
+                            <Label Grid.Column="2" x:Name="Day2Label" Text="" FontSize="10" TextColor="{StaticResource Muted2Color}" HorizontalOptions="Center"/>
+                            <Label Grid.Column="3" x:Name="Day3Label" Text="" FontSize="10" TextColor="{StaticResource Muted2Color}" HorizontalOptions="Center"/>
+                            <Label Grid.Column="4" x:Name="Day4Label" Text="" FontSize="10" TextColor="{StaticResource Muted2Color}" HorizontalOptions="Center"/>
+                            <Label Grid.Column="5" x:Name="Day5Label" Text="" FontSize="10" TextColor="{StaticResource Muted2Color}" HorizontalOptions="Center"/>
+                            <Label Grid.Column="6" x:Name="Day6Label" Text="" FontSize="10" TextColor="{StaticResource Muted2Color}" HorizontalOptions="Center"/>
+                        </Grid>
+                        <BoxView Color="{StaticResource DividerSoftColor}" HeightRequest="1" Margin="0,4,0,0"/>
+                        <Grid ColumnDefinitions="*,Auto">
+                            <Label Grid.Column="0" x:Name="TrendMaxLabel" Text="" FontSize="11" TextColor="{StaticResource MutedColor}"/>
+                            <Label Grid.Column="1" x:Name="TrendAvgLabel" Text="" FontSize="11" TextColor="{StaticResource AccentColor}" FontAttributes="Bold"/>
+                        </Grid>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- ===== Top 3 marts ===== -->
+                <Grid Padding="24,22,24,8" ColumnDefinitions="*,Auto">
+                    <Label Grid.Column="0" Text="마트별 지출 Top 3" FontSize="14" FontAttributes="Bold" TextColor="{StaticResource TextColor}"/>
+                    <Label Grid.Column="1" x:Name="MartCountLabel" Text="" FontSize="11" TextColor="{StaticResource MutedColor}" VerticalOptions="Center"/>
+                </Grid>
+
+                <Border Margin="16,0" Background="{StaticResource SurfaceColor}" Stroke="Transparent" StrokeShape="RoundRectangle 18" Padding="18,16">
+                    <Border.Shadow>
+                        <Shadow Brush="#0A1F33" Offset="0,2" Radius="6" Opacity="0.06"/>
+                    </Border.Shadow>
+                    <VerticalStackLayout x:Name="Top3Container" Spacing="14"/>
+                </Border>
+
+                <!-- ===== Insight banner ===== -->
+                <Border x:Name="InsightBorder" Margin="16,18,16,0" Stroke="Transparent" StrokeShape="RoundRectangle 14" Padding="16" IsVisible="False">
+                    <Border.Background>
+                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                            <GradientStop Color="#EEF2F7" Offset="0"/>
+                            <GradientStop Color="#F1F5F9" Offset="1"/>
+                        </LinearGradientBrush>
+                    </Border.Background>
+                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
+                        <Border Grid.Column="0" Stroke="Transparent" Background="White" StrokeShape="RoundRectangle 10" WidthRequest="36" HeightRequest="36">
+                            <Label Text="💡" FontSize="18" HorizontalOptions="Center" VerticalOptions="Center"/>
+                        </Border>
+                        <VerticalStackLayout Grid.Column="1" Spacing="3" VerticalOptions="Center">
+                            <Label x:Name="InsightTitleLabel" Text="이번 달 인사이트" FontSize="12" FontAttributes="Bold" TextColor="{StaticResource PrimaryColor}" CharacterSpacing="0.3"/>
+                            <Label x:Name="InsightBodyLabel" Text="" FontSize="13" FontAttributes="Bold" TextColor="{StaticResource TextColor}" LineHeight="1.4"/>
+                        </VerticalStackLayout>
+                    </Grid>
+                </Border>
+
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <controls:BottomNav Grid.Row="2" Active="stats"/>
+
+    </Grid>
+
+</ContentPage>

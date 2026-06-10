@@ -1,0 +1,783 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+<title>MartCart · 상품 촬영 (실제 OCR)</title>
+<link rel="preconnect" href="https://cdn.jsdelivr.net"/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css"/>
+<link rel="stylesheet" href="styles.css"/>
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+<style>
+  /* ===== Camera preview (real video) ===== */
+  .preview{position:absolute; inset:0; background:#0A0F18; overflow:hidden}
+  #video{position:absolute; inset:0; width:100%; height:100%; object-fit:cover}
+  .no-cam{
+    position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center;
+    color:#fff; padding:40px; text-align:center;
+  }
+  .no-cam .ic{font-size:48px; margin-bottom:14px}
+  .no-cam h3{margin:0 0 6px; font-size:16px}
+  .no-cam p{margin:0; font-size:12px; opacity:.7; line-height:1.5}
+  .no-cam code{background:rgba(255,255,255,.12); padding:2px 6px; border-radius:4px; font-size:11px}
+  .no-cam button{margin-top:18px; background:var(--accent); color:#fff; border:none; padding:10px 20px; border-radius:10px; font-size:13px; font-weight:700; cursor:pointer; font-family:inherit}
+
+  /* ===== Top action bar ===== */
+  .top-actions{position:absolute; top:60px; left:0; right:0; display:flex; justify-content:space-between; padding:0 24px; z-index:14}
+  .top-actions .right-group{display:flex; gap:10px}
+  .flash-btn.on{background:#FFD700; color:#1A1A1A}
+
+  /* ===== Cart strip ===== */
+  .cart-strip{
+    position:absolute; left:16px; right:16px; top:108px; z-index:14;
+    background:rgba(15,23,42,.65); backdrop-filter:blur(12px);
+    color:#fff; border-radius:14px; padding:10px 14px;
+    display:flex; align-items:center; gap:12px;
+    border:1px solid rgba(255,255,255,.12);
+  }
+  .cart-strip .ic{width:32px; height:32px; border-radius:9px; background:rgba(255,255,255,.12); display:flex; align-items:center; justify-content:center}
+  .cart-strip .ic svg{width:16px; height:16px}
+  .cart-strip .info{flex:1; min-width:0}
+  .cart-strip .info .t{font-size:11px; opacity:.7; line-height:1}
+  .cart-strip .info .v{font-size:14px; font-weight:800; font-feature-settings:'tnum'; margin-top:3px}
+  .cart-strip .info .v small{font-size:10px; font-weight:600; opacity:.7; margin-left:4px}
+  .cart-strip .progress{flex:1.4; max-width:120px}
+  .cart-strip .progress .bar{height:6px; background:rgba(255,255,255,.15); border-radius:3px; overflow:hidden}
+  .cart-strip .progress .bar > i{display:block; height:100%; background:linear-gradient(90deg, var(--accent-2), #4ade80); border-radius:3px}
+  .cart-strip .progress .lbl{font-size:10px; opacity:.85; margin-top:3px; text-align:right; font-feature-settings:'tnum'}
+
+  /* ===== Guide frame ===== */
+  .guide{position:absolute; left:30px; top:240px; width:330px; height:280px; pointer-events:none; z-index:12}
+  .corner{position:absolute; width:34px; height:34px; border:3px solid #fff; border-radius:4px}
+  .corner.tl{top:0; left:0; border-right:0; border-bottom:0}
+  .corner.tr{top:0; right:0; border-left:0; border-bottom:0}
+  .corner.bl{bottom:0; left:0; border-right:0; border-top:0}
+  .corner.br{bottom:0; right:0; border-left:0; border-top:0}
+
+  .scanline{position:absolute; left:6%; right:6%; height:2px; background:linear-gradient(90deg, transparent, var(--accent-2), transparent); box-shadow:0 0 12px var(--accent-2); top:0; opacity:0}
+  .scanning .scanline{animation:scan 1.6s ease-in-out infinite; opacity:1}
+  @keyframes scan{0%{top:0; opacity:0} 15%{opacity:1} 50%{top:calc(100% - 2px); opacity:1} 100%{top:0; opacity:0}}
+
+  /* ===== Guidance text ===== */
+  .guide-text{
+    position:absolute; left:50%; top:560px; transform:translateX(-50%);
+    background:rgba(0,0,0,.6); backdrop-filter:blur(8px);
+    color:#fff; font-size:13px; font-weight:600;
+    padding:9px 20px; border-radius:20px; z-index:13;
+    display:flex; align-items:center; gap:6px; max-width:280px; text-align:center;
+  }
+  .guide-text.scanning{background:rgba(0,169,104,.85)}
+
+  /* ===== Bottom controls ===== */
+  .bottom-area{position:absolute; left:0; right:0; bottom:0; height:200px; z-index:13; background:linear-gradient(180deg, transparent, rgba(0,0,0,.6)); pointer-events:none}
+  .gallery, .shutter, .help{z-index:15}
+  .gallery{position:absolute; left:32px; bottom:80px; width:48px; height:48px; border-radius:10px; border:1px solid rgba(255,255,255,.4); background:rgba(255,255,255,.12); display:flex; align-items:center; justify-content:center; cursor:pointer}
+  .gallery::after{content:"갤러리"; position:absolute; left:-4px; right:-4px; bottom:-22px; font-size:10px; color:#fff; opacity:.8; text-align:center}
+  .gallery svg{width:24px; height:24px; opacity:.7}
+
+  .shutter{position:absolute; left:50%; bottom:64px; transform:translateX(-50%); width:88px; height:88px; border-radius:50%; border:4px solid #fff; padding:6px; cursor:pointer; transition:transform .1s; background:transparent}
+  .shutter:active{transform:translateX(-50%) scale(.94)}
+  .shutter > i{display:block; width:100%; height:100%; border-radius:50%; background:#fff}
+  .shutter.disabled{opacity:.5; pointer-events:none}
+
+  .help{position:absolute; right:32px; bottom:80px; width:48px; height:48px; border-radius:50%; border:1px solid rgba(255,255,255,.5); background:rgba(255,255,255,.12); display:flex; align-items:center; justify-content:center; cursor:pointer; color:#fff; font-weight:700; font-size:18px}
+  .help::after{content:"도움말"; position:absolute; left:-4px; right:-4px; bottom:-22px; font-size:10px; color:#fff; opacity:.8; text-align:center; font-weight:400}
+
+  /* ===== Hidden canvas for capture ===== */
+  #captureCanvas{display:none}
+
+  /* ===== Flash overlay ===== */
+  .flash-overlay{position:absolute; inset:0; background:#fff; opacity:0; pointer-events:none; z-index:50; transition:opacity .12s}
+  .flash-overlay.fire{opacity:.9}
+
+  /* ===== Processing overlay ===== */
+  .processing{
+    position:absolute; inset:0;
+    background:rgba(10,15,24,.85); backdrop-filter:blur(6px);
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    z-index:42; opacity:0; pointer-events:none; transition:opacity .25s;
+    color:#fff;
+  }
+  .processing.show{opacity:1; pointer-events:auto}
+  .processing .ring{width:64px; height:64px; border-radius:50%; border:4px solid rgba(255,255,255,.18); border-top-color:var(--accent-2); animation:spin 1s linear infinite; margin-bottom:18px}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .processing .t1{font-size:15px; font-weight:700; margin-bottom:4px}
+  .processing .t2{font-size:12px; opacity:.7; text-align:center; padding:0 32px}
+  .processing .progress-text{font-size:11px; opacity:.6; margin-top:14px; font-feature-settings:'tnum'}
+  .processing .pct{font-size:32px; font-weight:800; margin-top:6px; color:var(--accent-2); font-feature-settings:'tnum'}
+
+  /* ===== Result sheet ===== */
+  .sheet .header h3 small{font-size:12px; font-weight:600; color:var(--muted); margin-left:8px}
+  .prod-row{display:flex; gap:14px; align-items:flex-start; padding:8px 0 4px}
+  .prod-thumb{
+    width:72px; height:72px; border-radius:14px;
+    background:linear-gradient(135deg, #FBBF24, #F59E0B);
+    flex-shrink:0; display:flex; align-items:center; justify-content:center;
+    font-size:34px; color:#fff;
+    box-shadow:inset 0 0 0 1px rgba(0,0,0,.06);
+    overflow:hidden;
+  }
+  .prod-thumb img{width:100%; height:100%; object-fit:cover}
+  .prod-info{flex:1; min-width:0}
+  .prod-info small{display:block; font-size:11px; color:var(--muted); margin-top:4px}
+  .prod-info .name-edit{display:flex; align-items:center; gap:6px; margin-top:4px}
+  .prod-info .name-edit input{
+    flex:1; min-width:0; font-family:inherit;
+    font-size:16px; font-weight:700; color:var(--text);
+    background:transparent; border:none; outline:none; padding:0;
+    border-bottom:1.5px dashed transparent;
+  }
+  .prod-info .name-edit input:focus{border-bottom-color:var(--primary)}
+  .prod-info .meta{font-size:11px; color:var(--muted-2); margin-top:6px}
+
+  .price-card{margin-top:18px; background:#F7F8FA; border-radius:16px; padding:18px}
+  .price-card .row{display:flex; justify-content:space-between; align-items:center; padding:6px 0; font-feature-settings:'tnum'}
+  .price-card .row.l label, .price-card .row.d label{font-size:13px; color:var(--muted)}
+  .price-card .row.l input, .price-card .row.d input, .price-card .row.sale input{
+    font-family:inherit; font-feature-settings:'tnum';
+    background:transparent; border:none; outline:none; text-align:right;
+    width:120px; padding:0;
+  }
+  .price-card .row.l input{font-size:15px; font-weight:600; color:var(--muted); text-decoration:line-through}
+  .price-card .row.d input{font-size:15px; font-weight:700; color:var(--danger)}
+  .price-card hr{border:0; border-top:1px solid var(--divider); margin:8px 0}
+  .price-card .row.sale label{font-size:13px; font-weight:700; color:var(--text)}
+  .price-card .row.sale input{font-size:26px; font-weight:800; letter-spacing:-1px; color:var(--text); width:160px}
+  .conf-badge{display:inline-flex; align-items:center; gap:5px; margin-top:12px; padding:5px 11px; border-radius:var(--r-chip); font-size:11px; font-weight:700}
+  .conf-badge.ok{background:var(--accent-bg-2); color:var(--accent-dark)}
+  .conf-badge.warn{background:var(--warn-bg); color:var(--warn-text)}
+  .conf-badge.bad{background:#FEE2E2; color:var(--danger)}
+  .conf-badge svg{width:11px; height:11px}
+
+  .raw-text{
+    margin-top:12px; padding:10px 12px;
+    background:#F1F5F9; border-radius:10px;
+    font-size:10px; color:var(--muted); line-height:1.4;
+    max-height:80px; overflow-y:auto; font-family:monospace;
+  }
+  .raw-text summary{cursor:pointer; font-weight:600; color:var(--primary); font-family:Pretendard,sans-serif; font-size:11px}
+  .raw-text pre{margin:6px 0 0; white-space:pre-wrap; word-break:break-all}
+
+  .qty-row{display:flex; justify-content:space-between; align-items:center; margin-top:14px; padding:10px 16px; background:#F7F8FA; border-radius:14px}
+  .qty-row label{font-size:13px; font-weight:600}
+
+  .sheet .footer .btn{height:54px; font-size:15px}
+  .sheet .footer .btn.cancel{flex:1; background:#fff; border:1.5px solid var(--divider); color:var(--muted)}
+  .sheet .footer .btn.primary{flex:2.2; background:var(--grad-primary); color:#fff; box-shadow:var(--shadow-btn-lg)}
+  .sheet .footer .btn svg{width:18px; height:18px}
+
+  /* ===== Worker warm-up banner ===== */
+  .warmup{
+    position:absolute; left:16px; right:16px; bottom:200px;
+    background:rgba(0,0,0,.7); backdrop-filter:blur(8px);
+    color:#fff; padding:10px 14px; border-radius:12px;
+    font-size:11px; text-align:center; z-index:14;
+    transition:opacity .3s;
+    display:flex; align-items:center; justify-content:center; gap:8px;
+  }
+  .warmup.hidden{opacity:0; pointer-events:none}
+  .warmup .mini-ring{width:14px; height:14px; border:2px solid rgba(255,255,255,.3); border-top-color:var(--accent-2); border-radius:50%; animation:spin 1s linear infinite}
+</style>
+</head>
+<body>
+
+<div class="device dark">
+
+  <div class="preview">
+    <video id="video" autoplay playsinline muted></video>
+    <div class="no-cam" id="noCam" style="display:none">
+      <div class="ic">📷</div>
+      <h3 id="noCamTitle">카메라를 사용할 수 없어요</h3>
+      <p id="noCamMsg">브라우저 권한을 허용해 주세요.<br/>또는 <code>http://localhost</code> 로 열어주세요<br/>(파일 직접 열기 <code>file://</code> 에서는 카메라가 차단됩니다)</p>
+      <button onclick="initCamera()">다시 시도</button>
+    </div>
+  </div>
+
+  <canvas id="captureCanvas"></canvas>
+
+  <!-- Status bar -->
+  <div class="statusbar on-dark">
+    <span>9:41</span>
+    <div class="right">
+      <div class="bars"><span></span><span></span><span></span><span></span></div>
+      <div class="battery"><i></i></div>
+    </div>
+  </div>
+  <div class="island"></div>
+
+  <!-- Top actions -->
+  <div class="top-actions">
+    <div class="icon-btn" onclick="window.location.href='index.html'" title="닫기">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+    </div>
+    <div class="right-group">
+      <div class="icon-btn" id="switchCam" onclick="switchCamera()" title="카메라 전환">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.5 9a9 9 0 0 1 14.85-3.36L23 10"/><path d="M20.5 15a9 9 0 0 1-14.85 3.36L1 14"/></svg>
+      </div>
+      <div class="icon-btn" title="더보기">
+        <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- Cart strip -->
+  <div class="cart-strip">
+    <div class="ic">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="20" r="1.5"/><circle cx="18" cy="20" r="1.5"/><path d="M1 1h4l2.7 13.4a2 2 0 0 0 2 1.6h9.7a2 2 0 0 0 2-1.6L23 6H6"/></svg>
+    </div>
+    <div class="info">
+      <div class="t">현재 합산 · 임계치 기준</div>
+      <div class="v">39,600원<small>/ 50,000원</small></div>
+    </div>
+    <div class="progress">
+      <div class="bar"><i style="width:79.2%"></i></div>
+      <div class="lbl">10,400원 남음</div>
+    </div>
+  </div>
+
+  <!-- Guide frame -->
+  <div class="guide" id="guideEl">
+    <div class="corner tl"></div>
+    <div class="corner tr"></div>
+    <div class="corner bl"></div>
+    <div class="corner br"></div>
+    <div class="scanline"></div>
+  </div>
+
+  <!-- Guidance text -->
+  <div class="guide-text" id="guideText">
+    <span id="guideLabel">가격표를 사각형 안에 맞추고 셔터를 누르세요</span>
+  </div>
+
+  <!-- Bottom controls -->
+  <div class="bottom-area"></div>
+  <div class="gallery" onclick="document.getElementById('fileInput').click()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.6"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-5-5L5 21"/></svg>
+  </div>
+  <input type="file" id="fileInput" accept="image/*" style="display:none" onchange="processFile(event)"/>
+  <div class="shutter" id="shutter" onclick="capture()"><i></i></div>
+  <div class="help" onclick="toast('상품·가격표를 함께 프레임에 맞추세요. PC라면 갤러리로 이미지를 올려 테스트 가능합니다')">?</div>
+
+  <!-- Warm-up banner (Tesseract loading first time) -->
+  <div class="warmup hidden" id="warmup">
+    <div class="mini-ring"></div>
+    <span id="warmupMsg">한국어 OCR 모델 로딩 중…</span>
+  </div>
+
+  <!-- Flash + processing + sheet -->
+  <div class="flash-overlay" id="flashOverlay"></div>
+
+  <div class="processing" id="processingEl">
+    <div class="ring"></div>
+    <div class="t1" id="procT1">분석 중…</div>
+    <div class="t2" id="procT2">텍스트를 인식하고 있어요</div>
+    <div class="pct" id="procPct">0%</div>
+  </div>
+
+  <div class="backdrop" id="backdrop" onclick="closeSheet()"></div>
+
+  <div class="sheet" id="sheet">
+    <div class="handle"></div>
+    <div class="header">
+      <h3>인식 결과 <small id="confSub"></small></h3>
+      <span class="action" onclick="closeSheet()">재촬영</span>
+    </div>
+    <div class="body">
+      <div class="prod-row">
+        <div class="prod-thumb" id="prodThumb">📦</div>
+        <div class="prod-info">
+          <small>상품명 · 필요시 수정</small>
+          <div class="name-edit">
+            <input id="nameInput" type="text" placeholder="상품명을 입력하세요"/>
+          </div>
+          <div class="meta" id="metaInfo">Tesseract.js · 한글+영문</div>
+        </div>
+      </div>
+
+      <div class="price-card">
+        <div class="row l"><label>정상가</label><input id="origInput" type="text" inputmode="numeric"/></div>
+        <div class="row d"><label>할인</label><input id="discInput" type="text" inputmode="numeric"/></div>
+        <hr/>
+        <div class="row sale"><label>판매가</label><input id="saleInput" type="text" inputmode="numeric"/></div>
+        <div class="conf-badge" id="confBadge">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg>
+          <span id="confText">검증 중</span>
+        </div>
+        <details class="raw-text">
+          <summary>OCR 원문 보기</summary>
+          <pre id="rawText"></pre>
+        </details>
+      </div>
+
+      <div class="qty-row">
+        <label>수량</label>
+        <div class="stepper">
+          <button id="qMinus" onclick="qty(-1)">−</button>
+          <div class="val" id="qVal">1</div>
+          <button onclick="qty(1)">+</button>
+        </div>
+      </div>
+    </div>
+    <div class="footer">
+      <button class="btn cancel" onclick="closeSheet()">취소</button>
+      <button class="btn primary" onclick="addToCart()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/></svg>
+        장바구니에 추가
+      </button>
+    </div>
+  </div>
+
+  <div class="toast" id="toast">
+    <svg id="toastIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" style="display:none"><path d="m5 12 5 5L20 7"/></svg>
+    <span id="toastMsg">메시지</span>
+  </div>
+
+  <div class="home-indicator light"></div>
+</div>
+
+<div class="caption">진짜 카메라 + Tesseract.js (한글 OCR) · <a href="index.html">← 장바구니로</a></div>
+
+<script>
+  // ==================================================
+  // 1. Camera setup
+  // ==================================================
+  const video = document.getElementById('video');
+  const noCam = document.getElementById('noCam');
+  let stream = null;
+  let facingMode = 'environment'; // rear camera first
+
+  async function initCamera(){
+    noCam.style.display = 'none';
+    try {
+      if (stream) stream.getTracks().forEach(t => t.stop());
+      stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: { ideal: facingMode }, width: { ideal: 1920 }, height: { ideal: 1080 } },
+        audio: false,
+      });
+      video.srcObject = stream;
+    } catch (err) {
+      console.error(err);
+      noCam.style.display = 'flex';
+      const title = document.getElementById('noCamTitle');
+      const msg = document.getElementById('noCamMsg');
+      if (err.name === 'NotAllowedError'){
+        title.textContent = '카메라 권한이 거부되었어요';
+        msg.innerHTML = '브라우저 주소창의 자물쇠 아이콘에서<br/>카메라 권한을 허용으로 바꿔주세요';
+      } else if (err.name === 'NotFoundError'){
+        title.textContent = '카메라를 찾을 수 없어요';
+        msg.innerHTML = '연결된 카메라가 없는 듯해요.<br/>갤러리 버튼으로 이미지를 올려 OCR을 시험해 보세요';
+      } else if (location.protocol === 'file:'){
+        title.textContent = 'localhost가 필요해요';
+        msg.innerHTML = '브라우저는 <code>file://</code> 에서는 카메라를 허용하지 않아요.<br/>VSCode Live Server나 <code>python -m http.server</code> 로<br/><code>http://localhost</code> 에서 열어주세요';
+      }
+    }
+  }
+
+  function switchCamera(){
+    facingMode = facingMode === 'environment' ? 'user' : 'environment';
+    initCamera();
+  }
+
+  initCamera();
+
+  // ==================================================
+  // 2. Tesseract.js worker (warm-up + reuse)
+  // ==================================================
+  let worker = null;
+  let workerReady = false;
+  let workerInitPromise = null;
+  const warmup = document.getElementById('warmup');
+  const warmupMsg = document.getElementById('warmupMsg');
+
+  // Global progress sink so logger updates the active overlay
+  let progressSink = null;
+
+  async function initWorker(){
+    if (worker) return worker;
+    if (workerInitPromise) return workerInitPromise;
+    warmup.classList.remove('hidden');
+    warmupMsg.textContent = '한국어 OCR 모델 로딩 중…';
+    workerInitPromise = Tesseract.createWorker(['kor', 'eng'], 1, {
+      logger: m => {
+        console.log('[Tesseract]', m.status, m.progress);
+        if (m.status === 'recognizing text' && progressSink){
+          progressSink(m.progress);
+        } else if (/loading|initializing/.test(m.status||'')){
+          warmupMsg.textContent = `OCR 준비 중 (${m.status}) ${Math.round((m.progress||0)*100)}%`;
+        }
+      }
+    }).then(w => {
+      worker = w;
+      workerReady = true;
+      warmup.classList.add('hidden');
+      return w;
+    }).catch(err => {
+      console.error('[Tesseract init failed]', err);
+      warmupMsg.textContent = 'OCR 로딩 실패 · 새로고침 해주세요';
+      throw err;
+    });
+    return workerInitPromise;
+  }
+  initWorker();
+
+  // ==================================================
+  // 3. Capture and OCR
+  // ==================================================
+  function toggleFlash(){ document.getElementById('flashBtn')?.classList.toggle('on'); }
+
+  let busy = false;
+  async function capture(){
+    if (busy) return;
+    if (!video.videoWidth){
+      toast('카메라가 아직 준비되지 않았어요');
+      return;
+    }
+    busy = true;
+    const fo = document.getElementById('flashOverlay');
+    fo.classList.add('fire');
+    setTimeout(()=> fo.classList.remove('fire'), 130);
+
+    const shutter = document.getElementById('shutter');
+    shutter.classList.add('disabled');
+
+    // Capture full video frame (no crop — let OCR see everything)
+    const canvas = document.getElementById('captureCanvas');
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(video, 0, 0);
+
+    const thumb = document.createElement('canvas');
+    thumb.width = 144; thumb.height = 144;
+    thumb.getContext('2d').drawImage(canvas, 0, 0, 144, 144);
+    const thumbUrl = thumb.toDataURL('image/jpeg', 0.7);
+
+    await runOcr(canvas, thumbUrl);
+
+    busy = false;
+    shutter.classList.remove('disabled');
+  }
+
+  async function processFile(e){
+    const file = e.target.files[0];
+    if (!file) return;
+    const img = new Image();
+    img.onload = async () => {
+      const canvas = document.getElementById('captureCanvas');
+      canvas.width = img.naturalWidth;
+      canvas.height = img.naturalHeight;
+      canvas.getContext('2d').drawImage(img, 0, 0);
+      const thumb = document.createElement('canvas');
+      thumb.width = 144; thumb.height = 144;
+      thumb.getContext('2d').drawImage(img, 0, 0, 144, 144);
+      const thumbUrl = thumb.toDataURL('image/jpeg', 0.7);
+      await runOcr(canvas, thumbUrl);
+    };
+    img.src = URL.createObjectURL(file);
+    e.target.value = '';
+  }
+
+  async function runOcr(imgCanvas, thumbUrl){
+    const proc = document.getElementById('processingEl');
+    const procT1 = document.getElementById('procT1');
+    const procT2 = document.getElementById('procT2');
+    const procPct = document.getElementById('procPct');
+    procT1.textContent = workerReady ? '인식 중…' : 'OCR 준비 중…';
+    procT2.textContent = '한글 + 숫자 텍스트를 추출하고 있어요';
+    procPct.textContent = '0%';
+    proc.classList.add('show');
+
+    // Downscale + preprocess (grayscale, contrast boost, threshold)
+    let ocrCanvas = preprocess(imgCanvas, 1400);
+
+    progressSink = p => { procPct.textContent = Math.round(p * 100) + '%'; };
+
+    const w = await initWorker();
+    let text = '';
+    let avgConf = 0;
+    try {
+      // Pass 1: numeric-friendly recognition (eng-only, faster, more accurate digits)
+      procT1.textContent = '가격 인식 중…';
+      await w.setParameters({
+        tessedit_char_whitelist: '0123456789,. 원',
+        tessedit_pageseg_mode: '6',
+      });
+      const r1 = await w.recognize(ocrCanvas);
+      const digitsText = r1.data.text || '';
+
+      // Pass 2: Korean text for product name (no whitelist)
+      procT1.textContent = '상품명 인식 중…';
+      procPct.textContent = '0%';
+      await w.setParameters({
+        tessedit_char_whitelist: '',
+        tessedit_pageseg_mode: '6',
+      });
+      const r2 = await w.recognize(ocrCanvas);
+      const koreanText = r2.data.text || '';
+
+      text = digitsText + '\n=== 한글 ===\n' + koreanText;
+      avgConf = ((r1.data.confidence||0) + (r2.data.confidence||0)) / 2;
+
+      // For extractors we want both texts merged
+      runOcrResult(digitsText, koreanText, avgConf, text, thumbUrl);
+    } catch (err) {
+      console.error('[OCR error]', err);
+      progressSink = null;
+      proc.classList.remove('show');
+      toast('OCR 실패 · ' + (err.message || '다시 시도'));
+      return;
+    } finally {
+      progressSink = null;
+    }
+    proc.classList.remove('show');
+    return;
+
+    // (legacy path retained for fileInput) ------
+    const candidates = extractPrices(text);
+    const name = extractProductName(text);
+    const cls = classifyPrices(candidates);
+
+    // Populate sheet
+    document.getElementById('nameInput').value = name || '';
+    document.getElementById('origInput').value = cls.original ? cls.original.toLocaleString('ko-KR') + '원' : '';
+    document.getElementById('discInput').value = cls.discount ? cls.discount.toLocaleString('ko-KR') + '원' : '';
+    document.getElementById('saleInput').value = cls.sale ? cls.sale.toLocaleString('ko-KR') + '원' : '';
+
+    const badge = document.getElementById('confBadge');
+    const ct = document.getElementById('confText');
+    badge.classList.remove('ok','warn','bad');
+    if (cls.confidence >= 0.80){
+      badge.classList.add('ok');
+      ct.textContent = `검증식 통과 · 신뢰도 ${Math.round(cls.confidence*100)}%`;
+    } else if (cls.confidence >= 0.5){
+      badge.classList.add('warn');
+      ct.textContent = `확인 필요 · 신뢰도 ${Math.round(cls.confidence*100)}%`;
+    } else {
+      badge.classList.add('bad');
+      ct.textContent = candidates.length ? `분류 실패 · 후보 ${candidates.length}개` : '가격 인식 실패 · 수동 입력';
+    }
+    document.getElementById('confSub').textContent = `· 후보 ${candidates.length}개`;
+    document.getElementById('rawText').textContent = text.trim() || '(빈 결과)';
+    document.getElementById('metaInfo').textContent = `Tesseract.js · ${ret.data.confidence ? '신뢰도 ' + Math.round(ret.data.confidence) + '%' : '한글+영문'}`;
+
+    const thumb = document.getElementById('prodThumb');
+    thumb.innerHTML = '';
+    const img = document.createElement('img');
+    img.src = thumbUrl;
+    thumb.appendChild(img);
+
+    openSheet();
+  }
+
+  // ==================================================
+  // Preprocess image — grayscale + contrast for OCR
+  // ==================================================
+  function preprocess(srcCanvas, maxW){
+    const ratio = srcCanvas.width > maxW ? maxW / srcCanvas.width : 1;
+    const w = Math.round(srcCanvas.width * ratio);
+    const h = Math.round(srcCanvas.height * ratio);
+    const out = document.createElement('canvas');
+    out.width = w; out.height = h;
+    const ctx = out.getContext('2d');
+    ctx.drawImage(srcCanvas, 0, 0, w, h);
+    const data = ctx.getImageData(0, 0, w, h);
+    const d = data.data;
+    for (let i = 0; i < d.length; i += 4){
+      // Luminance
+      let g = 0.299*d[i] + 0.587*d[i+1] + 0.114*d[i+2];
+      // Contrast boost (×1.6 around mid)
+      g = (g - 128) * 1.6 + 128;
+      g = Math.max(0, Math.min(255, g));
+      d[i] = d[i+1] = d[i+2] = g;
+    }
+    ctx.putImageData(data, 0, 0);
+    return out;
+  }
+
+  // ==================================================
+  // 4. Price extraction (regex) — §9.2 정규식
+  // ==================================================
+  function extractPrices(text){
+    // Normalize common OCR noise: O→0, l/I→1, B→8
+    const norm = text
+      .replace(/[Oo](?=\d)|(?<=\d)[Oo]/g, '0')
+      .replace(/[lI](?=\d{2,})|(?<=\d)[lI](?=\d)/g, '1');
+    const out = [];
+    const lines = norm.split(/[\r\n]+/);
+    // Allow optional spaces inside the comma-grouped number ("12, 300" → 12300)
+    const re = /(?:^|\D)(\d{1,3}(?:[,\s]\d{3})+|\d{3,7})\s*원?/g;
+    const barcodeRe = /(?<!\d)\d{8,14}(?!\d)/;
+    const dateRe = /(?:19|20)\d{6}\b/;
+    const unitPriceRe = /\d+\s?(?:g|ml|kg|개|ea)당\s*\d+\s*원?/i;
+    const yearOnlyRe = /\b(?:19|20)\d{2}\b/;
+    for (const line of lines){
+      const hasGuard = barcodeRe.test(line) || dateRe.test(line) || unitPriceRe.test(line);
+      const isYearOnly = yearOnlyRe.test(line) && !/[,원]/.test(line);
+      if (hasGuard || isYearOnly) continue;
+      let m;
+      const reLocal = new RegExp(re.source, 'g');
+      while ((m = reLocal.exec(line)) !== null){
+        const cleaned = m[1].replace(/[,\s]/g, '');
+        const num = parseInt(cleaned, 10);
+        if (num >= 100 && num < 10000000) out.push(num);
+      }
+    }
+    return out;
+  }
+
+  // ==================================================
+  // 5. Product name extraction — first reasonable line
+  // ==================================================
+  function extractProductName(text){
+    const lines = text.split(/[\r\n]+/).map(l => l.trim()).filter(l => l.length >= 2);
+    for (const line of lines){
+      const cleaned = line.replace(/[^가-힣A-Za-z0-9\s]/g, '').trim();
+      const digits = (cleaned.match(/\d/g) || []).length;
+      const ratio = digits / Math.max(1, cleaned.length);
+      // Skip mostly numeric lines (prices/barcodes), and very short lines
+      if (ratio < 0.4 && cleaned.length >= 3){
+        return cleaned.replace(/\s+/g, ' ');
+      }
+    }
+    return null;
+  }
+
+  // ==================================================
+  // 6. Classify — §9.3 (HeuristicPriceClassifier 그대로 포팅)
+  // ==================================================
+  function classifyPrices(candidates){
+    const TOL = 10;
+    const filtered = [...new Set(candidates.filter(c => c >= 100))].sort((a,b)=>b-a);
+
+    if (filtered.length === 0) return { confidence:0, requiresConfirm:true };
+    if (filtered.length === 1){
+      const p = filtered[0];
+      return { original:p, discount:0, sale:p, confidence:0.70, requiresConfirm:false };
+    }
+    if (filtered.length === 2){
+      const max = filtered[0], min = filtered[1];
+      return { original:max, discount:max-min, sale:min, confidence:0.50, requiresConfirm:true };
+    }
+    // 3+: search valid combination orig - disc = sale (±10)
+    for (let i=0; i<filtered.length; i++)
+    for (let j=0; j<filtered.length; j++)
+    for (let k=0; k<filtered.length; k++){
+      if (i===j || j===k || i===k) continue;
+      const orig = filtered[i], sale = filtered[j], disc = filtered[k];
+      if (orig <= sale) continue;
+      if (Math.abs(orig - disc - sale) <= TOL){
+        return { original:orig, discount:disc, sale, confidence:0.80, requiresConfirm:false };
+      }
+    }
+    const max = filtered[0], min = filtered[filtered.length-1];
+    return { original:max, discount:max-min, sale:min, confidence:0.40, requiresConfirm:true };
+  }
+
+  // ==================================================
+  // Two-pass result wiring
+  // ==================================================
+  function runOcrResult(digitsText, koreanText, avgConf, rawCombined, thumbUrl){
+    const candidates = extractPrices(digitsText + '\n' + koreanText);
+    const name = extractProductName(koreanText) || extractProductName(digitsText);
+    const cls = classifyPrices(candidates);
+
+    document.getElementById('nameInput').value = name || '';
+    document.getElementById('origInput').value = cls.original ? cls.original.toLocaleString('ko-KR') + '원' : '';
+    document.getElementById('discInput').value = cls.discount ? cls.discount.toLocaleString('ko-KR') + '원' : '';
+    document.getElementById('saleInput').value = cls.sale ? cls.sale.toLocaleString('ko-KR') + '원' : '';
+
+    const badge = document.getElementById('confBadge');
+    const ct = document.getElementById('confText');
+    badge.classList.remove('ok','warn','bad');
+    if (cls.confidence >= 0.80){
+      badge.classList.add('ok');
+      ct.textContent = `검증식 통과 · 신뢰도 ${Math.round(cls.confidence*100)}%`;
+    } else if (cls.confidence >= 0.5){
+      badge.classList.add('warn');
+      ct.textContent = `확인 필요 · 신뢰도 ${Math.round(cls.confidence*100)}%`;
+    } else {
+      badge.classList.add('bad');
+      ct.textContent = candidates.length ? `분류 실패 · 후보 ${candidates.length}개 · 수동 보정` : '가격 인식 실패 · 수동 입력';
+    }
+    document.getElementById('confSub').textContent = `· 후보 ${candidates.length}개`;
+    document.getElementById('rawText').textContent = (rawCombined || '(빈 결과)').trim();
+    document.getElementById('metaInfo').textContent = `Tesseract.js · OCR 신뢰도 ${Math.round(avgConf)}%`;
+
+    const thumb = document.getElementById('prodThumb');
+    thumb.innerHTML = '';
+    const img = document.createElement('img');
+    img.src = thumbUrl;
+    thumb.appendChild(img);
+
+    openSheet();
+  }
+
+  // ==================================================
+  // 7. Sheet + cart actions
+  // ==================================================
+  function openSheet(){ document.getElementById('backdrop').classList.add('show'); document.getElementById('sheet').classList.add('show'); }
+  function closeSheet(){ document.getElementById('backdrop').classList.remove('show'); document.getElementById('sheet').classList.remove('show'); }
+
+  let quantity = 1;
+  function qty(d){ quantity = Math.max(1, quantity + d); document.getElementById('qVal').textContent = quantity; document.getElementById('qMinus').disabled = quantity<=1; }
+
+  function addToCart(){
+    const name = document.getElementById('nameInput').value || '(이름 없음)';
+    const orig = parseInt((document.getElementById('origInput').value||'').replace(/[^\d]/g,''), 10) || 0;
+    const disc = parseInt((document.getElementById('discInput').value||'').replace(/[^\d]/g,''), 10) || 0;
+    const sale = parseInt((document.getElementById('saleInput').value||'').replace(/[^\d]/g,''), 10) || 0;
+
+    // Persist via localStorage so CartDetail picks it up
+    const added = JSON.parse(localStorage.getItem('martcart.added') || '[]');
+    added.push({
+      id: 'cam_' + Date.now(),
+      name,
+      original: orig || sale,
+      discount: disc,
+      sale: sale || orig,
+      quantity,
+      thumb: '📷',
+      addedAt: Date.now(),
+    });
+    localStorage.setItem('martcart.added', JSON.stringify(added));
+
+    closeSheet();
+    setTimeout(()=>{
+      toast(`${name} ×${quantity} 추가 · ${(sale*quantity).toLocaleString('ko-KR')}원`, true);
+      setTimeout(()=> window.location.href='index.html', 1100);
+    }, 200);
+  }
+
+  let toastTimer;
+  function toast(msg, success){
+    const t = document.getElementById('toast');
+    document.getElementById('toastMsg').textContent = msg;
+    document.getElementById('toastIcon').style.display = success ? 'block' : 'none';
+    t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(()=> t.classList.remove('show'), 3200);
+  }
+
+  // Drag-to-dismiss
+  const sheetEl = document.getElementById('sheet');
+  let dragY = null;
+  sheetEl.addEventListener('touchstart', e=>{
+    if (!e.target.closest('.handle') && !e.target.closest('.header')) return;
+    dragY = e.touches[0].clientY;
+  });
+  sheetEl.addEventListener('touchmove', e=>{
+    if (dragY === null) return;
+    const dy = e.touches[0].clientY - dragY;
+    if (dy > 0){ sheetEl.style.transition='none'; sheetEl.style.transform = `translateY(${dy}px)`; }
+  });
+  sheetEl.addEventListener('touchend', ()=>{
+    if (dragY === null) return;
+    sheetEl.style.transition = '';
+    const dy = parseInt((sheetEl.style.transform||'').replace(/[^0-9]/g,'')||'0',10);
+    if (dy > 100) closeSheet();
+    sheetEl.style.transform = '';
+    dragY = null;
+  });
+</script>
+</body>
+</html>

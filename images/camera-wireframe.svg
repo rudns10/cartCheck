@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 390 820" width="390" height="820"
+     font-family="Pretendard, -apple-system, 'Segoe UI', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif">
+
+  <!-- Camera preview background -->
+  <rect width="390" height="820" fill="#0A0F18"/>
+
+  <!-- Simulated shelf/background blur with subtle stripes -->
+  <g opacity="0.25">
+    <rect x="0" y="120" width="390" height="80" fill="#2D3548"/>
+    <rect x="0" y="400" width="390" height="100" fill="#2D3548"/>
+    <rect x="0" y="600" width="390" height="60" fill="#2D3548"/>
+  </g>
+
+  <!-- Simulated price tag visible behind guide frame -->
+  <g opacity="0.85">
+    <rect x="60" y="280" width="270" height="180" rx="4" fill="#F0F0EC"/>
+    <text x="80" y="320" font-size="16" font-weight="700" fill="#1A1A1A">서울우유 비요뜨</text>
+    <text x="80" y="342" font-size="11" fill="#6B7280">VIYOTT CHOCO RING</text>
+    <line x1="80" y1="370" x2="310" y2="370" stroke="#E5E7EB" stroke-width="1"/>
+    <text x="310" y="430" font-size="36" font-weight="800" fill="#1A1A1A" text-anchor="end"
+          font-feature-settings="'tnum'">8,980</text>
+  </g>
+
+  <!-- Status bar (white text) -->
+  <text x="24" y="28" font-size="14" font-weight="600" fill="#FFFFFF">9:41</text>
+  <g transform="translate(330,18)" fill="#FFFFFF">
+    <rect x="0" y="2" width="4" height="8" rx="1"/>
+    <rect x="6" y="0" width="4" height="10" rx="1"/>
+    <rect x="12" y="-2" width="4" height="12" rx="1"/>
+    <rect x="22" y="0" width="22" height="10" rx="2" fill="none" stroke="#FFFFFF" stroke-width="1"/>
+    <rect x="24" y="2" width="16" height="6" rx="1"/>
+  </g>
+
+  <!-- Top action bar: close + flash -->
+  <g transform="translate(24,60)" fill="none" stroke="#FFFFFF" stroke-width="2">
+    <circle cx="16" cy="16" r="16" fill="rgba(0,0,0,0.4)" stroke="none"/>
+    <line x1="10" y1="10" x2="22" y2="22" stroke-linecap="round"/>
+    <line x1="22" y1="10" x2="10" y2="22" stroke-linecap="round"/>
+  </g>
+
+  <g transform="translate(334,60)">
+    <circle cx="16" cy="16" r="16" fill="rgba(0,0,0,0.4)"/>
+    <path d="M 18 7 L 11 18 L 16 18 L 14 25 L 21 14 L 16 14 Z" fill="#FFFFFF"/>
+  </g>
+
+  <!-- ===== Center guide frame ===== -->
+  <!-- Corner markers (320×240 frame centered) -->
+  <g stroke="#FFFFFF" stroke-width="3" fill="none" stroke-linecap="round">
+    <!-- Top-left -->
+    <path d="M 35 260 L 35 230 L 65 230"/>
+    <!-- Top-right -->
+    <path d="M 355 230 L 325 230 L 325 260" transform="translate(0,0)"/>
+    <!-- Bottom-left -->
+    <path d="M 35 480 L 35 510 L 65 510"/>
+    <!-- Bottom-right -->
+    <path d="M 325 510 L 355 510 L 355 480"/>
+  </g>
+
+  <!-- Center crosshair (subtle) -->
+  <g stroke="#FFFFFF" stroke-width="1" opacity="0.4">
+    <line x1="190" y1="370" x2="200" y2="370"/>
+    <line x1="195" y1="365" x2="195" y2="375"/>
+  </g>
+
+  <!-- Guidance text -->
+  <rect x="65" y="550" width="260" height="40" rx="20" fill="rgba(0,0,0,0.6)"/>
+  <text x="195" y="575" font-size="13" font-weight="600" fill="#FFFFFF" text-anchor="middle">
+    가격표를 사각형 안에 맞춰주세요
+  </text>
+
+  <!-- ===== Bottom action area ===== -->
+  <!-- Gallery (small thumbnail) -->
+  <g transform="translate(40,700)">
+    <rect x="0" y="0" width="48" height="48" rx="8" fill="rgba(255,255,255,0.15)" stroke="#FFFFFF" stroke-width="1"/>
+    <circle cx="14" cy="16" r="4" fill="#FFFFFF" opacity="0.6"/>
+    <path d="M 4 40 L 18 26 L 30 36 L 36 32 L 44 40 Z" fill="#FFFFFF" opacity="0.6"/>
+  </g>
+  <text x="64" y="765" font-size="10" fill="#FFFFFF" opacity="0.7" text-anchor="middle">갤러리</text>
+
+  <!-- Shutter button 88dp -->
+  <circle cx="195" cy="724" r="44" fill="none" stroke="#FFFFFF" stroke-width="4"/>
+  <circle cx="195" cy="724" r="36" fill="#FFFFFF"/>
+
+  <!-- Help icon -->
+  <g transform="translate(302,700)" fill="none" stroke="#FFFFFF" stroke-width="1.5">
+    <circle cx="24" cy="24" r="22" fill="rgba(255,255,255,0.15)" stroke="#FFFFFF"/>
+    <path d="M 18 19 C 18 14 22 13 24 13 C 27 13 30 15 30 18 C 30 22 24 22 24 26"/>
+    <circle cx="24" cy="31" r="1.5" fill="#FFFFFF" stroke="none"/>
+  </g>
+  <text x="326" y="765" font-size="10" fill="#FFFFFF" opacity="0.7" text-anchor="middle">도움말</text>
+
+  <!-- Home indicator -->
+  <rect x="125" y="808" width="140" height="4" rx="2" fill="#FFFFFF"/>
+</svg>

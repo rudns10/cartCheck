@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="MartCart.AppFaithful.Pages.MartListPage"
+             Title="등록된 마트"
+             BackgroundColor="{StaticResource BgColor}">
+
+    <Grid RowDefinitions="Auto,*">
+
+        <Grid Grid.Row="0" Padding="20,18,20,12" ColumnDefinitions="*,Auto">
+            <Label Grid.Column="0" Text="등록된 마트" FontSize="22" FontAttributes="Bold" TextColor="{StaticResource TextColor}"/>
+            <Border Grid.Column="1" Stroke="Transparent" Background="{StaticResource PrimaryBrush}" StrokeShape="RoundRectangle 99" Padding="14,8">
+                <Label Text="＋ 추가" FontSize="12" FontAttributes="Bold" TextColor="White">
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnAddTapped"/>
+                    </Label.GestureRecognizers>
+                </Label>
+            </Border>
+        </Grid>
+
+        <ScrollView Grid.Row="1" Padding="0,0,0,24">
+            <VerticalStackLayout x:Name="ListLayout" Spacing="10" Padding="16,4,16,16"/>
+        </ScrollView>
+
+    </Grid>
+</ContentPage>

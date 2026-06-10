@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="MartCart.AppFaithful.Pages.PrivacyPage"
+             Title="개인정보 처리방침"
+             BackgroundColor="{StaticResource BgColor}">
+
+    <Grid RowDefinitions="Auto,*">
+
+        <VerticalStackLayout Grid.Row="0" Padding="20,18,20,12" Spacing="4">
+            <Label Text="개인정보 처리방침" FontSize="22" FontAttributes="Bold" TextColor="{StaticResource TextColor}"/>
+            <Label Text="최종 업데이트: 2026년 6월 1일" FontSize="11" TextColor="{StaticResource MutedColor}"/>
+        </VerticalStackLayout>
+
+        <ScrollView Grid.Row="1" Padding="0,0,0,24">
+            <VerticalStackLayout Spacing="12" Padding="16,4,16,16">
+
+                <!-- ===== 한 줄 요약 ===== -->
+                <Border Background="{StaticResource PrimaryBrush}" Stroke="Transparent" StrokeShape="RoundRectangle 14" Padding="18,16">
+                    <Border.Shadow>
+                        <Shadow Brush="#0F2A50" Offset="0,4" Radius="10" Opacity="0.2"/>
+                    </Border.Shadow>
+                    <VerticalStackLayout Spacing="6">
+                        <Label Text="🛡  요약" FontSize="13" FontAttributes="Bold" TextColor="White"/>
+                        <Label Text="카트체크는 오프라인 우선 앱입니다. 장바구니·구매 기록·설정은 기기 안에만 저장되며, 외부 서버로 전송되지 않습니다."
+                               FontSize="13" TextColor="White" Opacity="0.92"/>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- ===== 수집 항목 ===== -->
+                <Border Background="{StaticResource SurfaceColor}" Stroke="Transparent" StrokeShape="RoundRectangle 14" Padding="18,16">
+                    <Border.Shadow>
+                        <Shadow Brush="#0A1F33" Offset="0,2" Radius="6" Opacity="0.06"/>
+                    </Border.Shadow>
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="1. 수집·저장하는 정보" FontSize="14" FontAttributes="Bold"/>
+                        <Label FontSize="12" TextColor="{StaticResource TextColor}" LineHeight="1.5">
+                            <Label.FormattedText>
+                                <FormattedString>
+                                    <Span Text="• 장바구니 항목 (상품명·가격·할인·수량)&#x0a;"/>
+                                    <Span Text="• 마트 목록 및 목표 금액 설정&#x0a;"/>
+                                    <Span Text="• 장보기 기록 (날짜·마트·합계 등)&#x0a;"/>
+                                    <Span Text="• PIN 해시(SHA-256+Salt, PBKDF2) · 생체 인증 활성 여부"/>
+                                </FormattedString>
+                            </Label.FormattedText>
+                        </Label>
+                        <Label Text="위 정보는 모두 기기 내 Preferences 저장소에 저장되며, 앱 외부로 전송되지 않습니다."
+                               FontSize="11" TextColor="{StaticResource MutedColor}"/>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- ===== 수집하지 않는 것 ===== -->
+                <Border Background="{StaticResource SurfaceColor}" Stroke="Transparent" StrokeShape="RoundRectangle 14" Padding="18,16">
+                    <Border.Shadow>
+                        <Shadow Brush="#0A1F33" Offset="0,2" Radius="6" Opacity="0.06"/>
+                    </Border.Shadow>
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="2. 수집하지 않는 정보" FontSize="14" FontAttributes="Bold"/>
+                        <Label FontSize="12" TextColor="{StaticResource TextColor}" LineHeight="1.5">
+                            <Label.FormattedText>
+                                <FormattedString>
+                                    <Span Text="• 이름·전화번호·이메일 등 개인 식별 정보&#x0a;"/>
+                                    <Span Text="• 위치 정보&#x0a;"/>
+                                    <Span Text="• 광고 식별자·사용 통계·크래시 리포트&#x0a;"/>
+                                    <Span Text="• 카메라로 촬영한 사진(가격 인식 직후 폐기, 저장하지 않음)"/>
+                                </FormattedString>
+                            </Label.FormattedText>
+                        </Label>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- ===== 권한 ===== -->
+                <Border Background="{StaticResource SurfaceColor}" Stroke="Transparent" StrokeShape="RoundRectangle 14" Padding="18,16">
+                    <Border.Shadow>
+                        <Shadow Brush="#0A1F33" Offset="0,2" Radius="6" Opacity="0.06"/>
+                    </Border.Shadow>
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="3. 권한 사용 목적" FontSize="14" FontAttributes="Bold"/>
+                        <Label FontSize="12" TextColor="{StaticResource TextColor}" LineHeight="1.5">
+                            <Label.FormattedText>
+                                <FormattedString>
+                                    <Span Text="• 카메라: " FontAttributes="Bold"/>
+                                    <Span Text="가격표 촬영 → 온디바이스 OCR(Google ML Kit)로 가격·상품명 추출. 이미지는 저장하지 않습니다.&#x0a;"/>
+                                    <Span Text="• 생체 인증: " FontAttributes="Bold"/>
+                                    <Span Text="잠금 해제용. 지문/Face ID 정보는 OS가 관리하며 앱은 인증 결과만 받습니다."/>
+                                </FormattedString>
+                            </Label.FormattedText>
+                        </Label>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- ===== 보관·삭제 ===== -->
+                <Border Background="{StaticResource SurfaceColor}" Stroke="Transparent" StrokeShape="RoundRectangle 14" Padding="18,16">
+                    <Border.Shadow>
+                        <Shadow Brush="#0A1F33" Offset="0,2" Radius="6" Opacity="0.06"/>
+                    </Border.Shadow>
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="4. 보관 및 삭제" FontSize="14" FontAttributes="Bold"/>
+                        <Label FontSize="12" TextColor="{StaticResource TextColor}" LineHeight="1.5">
+                            <Label.FormattedText>
+                                <FormattedString>
+                                    <Span Text="• 사용자가 삭제할 때까지 기기 내에 보관됩니다.&#x0a;"/>
+                                    <Span Text="• 설정 → '모든 데이터 삭제'로 한 번에 영구 삭제할 수 있습니다.&#x0a;"/>
+                                    <Span Text="• 앱을 제거하면 모든 데이터가 함께 삭제됩니다."/>
+                                </FormattedString>
+                            </Label.FormattedText>
+                        </Label>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- ===== 제3자 ===== -->
+                <Border Background="{StaticResource SurfaceColor}" Stroke="Transparent" StrokeShape="RoundRectangle 14" Padding="18,16">
+                    <Border.Shadow>
+                        <Shadow Brush="#0A1F33" Offset="0,2" Radius="6" Opacity="0.06"/>
+                    </Border.Shadow>
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="5. 제3자 제공" FontSize="14" FontAttributes="Bold"/>
+                        <Label Text="카트체크는 사용자의 어떤 데이터도 제3자에게 제공하거나 판매하지 않습니다. OCR 처리에 사용되는 Google ML Kit Text Recognition은 온디바이스로 동작하며 네트워크 전송이 없습니다."
+                               FontSize="12" LineHeight="1.5"/>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- ===== 변경 안내 ===== -->
+                <Border Background="{StaticResource SurfaceColor}" Stroke="Transparent" StrokeShape="RoundRectangle 14" Padding="18,16">
+                    <Border.Shadow>
+                        <Shadow Brush="#0A1F33" Offset="0,2" Radius="6" Opacity="0.06"/>
+                    </Border.Shadow>
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="6. 방침 변경" FontSize="14" FontAttributes="Bold"/>
+                        <Label Text="처리방침이 변경되는 경우 앱 업데이트 시 본 화면에서 안내합니다."
+                               FontSize="12" LineHeight="1.5"/>
+                    </VerticalStackLayout>
+                </Border>
+
+                <Label Text="CartCheck · 한국어 · v0.1.0"
+                       FontSize="11" TextColor="{StaticResource Muted2Color}" HorizontalTextAlignment="Center" Margin="0,8,0,0"/>
+
+            </VerticalStackLayout>
+        </ScrollView>
+
+    </Grid>
+</ContentPage>

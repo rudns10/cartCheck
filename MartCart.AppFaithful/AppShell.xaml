@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Shell
+    x:Class="MartCart.AppFaithful.AppShell"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:pages="clr-namespace:MartCart.AppFaithful.Pages"
+    Shell.NavBarIsVisible="False"
+    Shell.TabBarIsVisible="False"
+    Shell.TabBarBackgroundColor="{StaticResource SurfaceColor}"
+    Shell.TabBarForegroundColor="{StaticResource PrimaryColor}"
+    Shell.TabBarUnselectedColor="{StaticResource MutedColor}"
+    Shell.TabBarTitleColor="{StaticResource PrimaryColor}">
+
+    <TabBar>
+        <Tab Title="홈">
+            <ShellContent Route="HomePage" ContentTemplate="{DataTemplate pages:HomePage}"/>
+        </Tab>
+        <Tab Title="기록">
+            <ShellContent Route="HistoryPage" ContentTemplate="{DataTemplate pages:HistoryPage}"/>
+        </Tab>
+        <Tab Title="통계">
+            <ShellContent Route="StatsPage" ContentTemplate="{DataTemplate pages:StatsPage}"/>
+        </Tab>
+        <Tab Title="설정">
+            <ShellContent Route="SettingsPage" ContentTemplate="{DataTemplate pages:SettingsPage}"/>
+        </Tab>
+    </TabBar>
+
+</Shell>

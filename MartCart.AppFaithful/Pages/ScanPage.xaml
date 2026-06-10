@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:cam="clr-namespace:CommunityToolkit.Maui.Views;assembly=CommunityToolkit.Maui.Camera"
+             x:Class="MartCart.AppFaithful.Pages.ScanPage"
+             Shell.NavBarIsVisible="False"
+             Shell.TabBarIsVisible="False"
+             BackgroundColor="Black">
+
+    <Grid>
+        <!-- Camera preview -->
+        <cam:CameraView x:Name="Camera" ZoomFactor="1.0" MediaCaptured="OnMediaCaptured"/>
+
+        <!-- Top bar -->
+        <Grid VerticalOptions="Start" Padding="20,52,20,0" ColumnDefinitions="Auto,*,Auto">
+            <Border Grid.Column="0" Stroke="Transparent" Background="#80000000" StrokeShape="RoundRectangle 19" WidthRequest="38" HeightRequest="38">
+                <Label Text="✕" FontSize="18" TextColor="White" FontAttributes="Bold" HorizontalOptions="Center" VerticalOptions="Center">
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnCloseClicked"/>
+                    </Label.GestureRecognizers>
+                </Label>
+            </Border>
+            <Label Grid.Column="1" Text="가격표 촬영" FontSize="16" FontAttributes="Bold" TextColor="White" HorizontalOptions="Center" VerticalOptions="Center"/>
+        </Grid>
+
+        <!-- Cart strip -->
+        <Border VerticalOptions="Start" Margin="16,150,16,0" Background="#A50F172A" Stroke="#33FFFFFF" StrokeThickness="1" StrokeShape="RoundRectangle 14" Padding="14,10">
+            <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+                <Border Grid.Column="0" Stroke="Transparent" Background="#33FFFFFF" StrokeShape="RoundRectangle 9" WidthRequest="32" HeightRequest="32">
+                    <Label Text="🛒" FontSize="14" HorizontalOptions="Center" VerticalOptions="Center"/>
+                </Border>
+                <VerticalStackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
+                    <Label Text="현재 합산 · 목표 금액 기준" FontSize="11" TextColor="White" Opacity="0.7"/>
+                    <Label x:Name="StripAmountLabel" FontSize="14" FontAttributes="Bold" TextColor="White" Text="0원"/>
+                </VerticalStackLayout>
+                <VerticalStackLayout Grid.Column="2" Spacing="2" VerticalOptions="Center" WidthRequest="120">
+                    <Border Stroke="Transparent" Background="#26FFFFFF" StrokeShape="RoundRectangle 3" HeightRequest="6">
+                        <Border x:Name="StripProgressFill" Stroke="Transparent" Background="{StaticResource ProgressLightBrush}" StrokeShape="RoundRectangle 3" WidthRequest="0" HorizontalOptions="Start"/>
+                    </Border>
+                    <Label x:Name="StripRemainingLabel" Text="" FontSize="10" TextColor="White" Opacity="0.85" HorizontalOptions="End"/>
+                </VerticalStackLayout>
+            </Grid>
+        </Border>
+
+        <!-- Guide frame -->
+        <Frame BackgroundColor="Transparent" BorderColor="White" CornerRadius="0" Padding="0"
+               WidthRequest="320" HeightRequest="240" HorizontalOptions="Center" VerticalOptions="Center" HasShadow="False"/>
+
+        <!-- Guide text pill -->
+        <Border BackgroundColor="#A0000000" StrokeThickness="0" StrokeShape="RoundRectangle 20"
+                Padding="18,8" HorizontalOptions="Center" VerticalOptions="End" Margin="0,0,0,220">
+            <Label x:Name="GuideLabel" Text="상품과 가격표가 함께 보이도록 맞춰주세요" FontSize="13" FontAttributes="Bold" TextColor="White"/>
+        </Border>
+
+        <!-- Bottom controls -->
+        <Grid VerticalOptions="End" HorizontalOptions="Fill" Margin="0,0,0,24" ColumnDefinitions="*,Auto,*">
+            <!-- Gallery -->
+            <Border Grid.Column="0" HorizontalOptions="Center" Stroke="#66FFFFFF" StrokeThickness="1" Background="#26FFFFFF" StrokeShape="RoundRectangle 10" WidthRequest="48" HeightRequest="48">
+                <Label Text="🖼" FontSize="20" HorizontalOptions="Center" VerticalOptions="Center"/>
+            </Border>
+            <!-- Shutter 88dp -->
+            <Border Grid.Column="1" Stroke="White" StrokeThickness="4" Background="Transparent" StrokeShape="RoundRectangle 44" WidthRequest="88" HeightRequest="88">
+                <Border Stroke="Transparent" Background="White" StrokeShape="RoundRectangle 36" WidthRequest="72" HeightRequest="72">
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnShutterClicked"/>
+                    </Border.GestureRecognizers>
+                </Border>
+            </Border>
+            <!-- Help -->
+            <Border Grid.Column="2" HorizontalOptions="Center" Stroke="#80FFFFFF" StrokeThickness="1" Background="#26FFFFFF" StrokeShape="RoundRectangle 24" WidthRequest="48" HeightRequest="48">
+                <Label Text="?" FontSize="20" FontAttributes="Bold" TextColor="White" HorizontalOptions="Center" VerticalOptions="Center"/>
+            </Border>
+        </Grid>
+
+        <!-- Loading overlay -->
+        <Grid x:Name="LoadingPanel" IsVisible="False" BackgroundColor="#A0000000">
+            <VerticalStackLayout HorizontalOptions="Center" VerticalOptions="Center" Spacing="14">
+                <ActivityIndicator IsRunning="True" Color="{StaticResource Accent2Color}" WidthRequest="48" HeightRequest="48"/>
+                <Label Text="ML Kit 한국어 OCR 분석 중…" TextColor="White" FontSize="14" FontAttributes="Bold"/>
+            </VerticalStackLayout>
+        </Grid>
+
+        <!-- Result sheet -->
+        <Border x:Name="ResultPanel" IsVisible="False"
+                BackgroundColor="{StaticResource SurfaceColor}"
+                StrokeShape="RoundRectangle 24,24,0,0"
+                StrokeThickness="0" VerticalOptions="End" Padding="0">
+            <ScrollView>
+                <VerticalStackLayout Padding="20,16" Spacing="14">
+                    <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="12">
+                        <Label Grid.Column="0" Text="인식 결과 · 필요 시 수정" FontSize="16" FontAttributes="Bold" TextColor="{StaticResource TextColor}"/>
+                        <Label Grid.Column="1" Text="✓ 완료" FontSize="14" FontAttributes="Bold" TextColor="{StaticResource PrimaryColor}" Padding="8,4">
+                            <Label.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnDoneTapped"/>
+                            </Label.GestureRecognizers>
+                        </Label>
+                        <Label Grid.Column="2" Text="✕" FontSize="14" TextColor="{StaticResource MutedColor}" Padding="6">
+                            <Label.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnCloseResult"/>
+                            </Label.GestureRecognizers>
+                        </Label>
+                    </Grid>
+
+                    <VerticalStackLayout Spacing="4">
+                        <Label Text="상품명" FontSize="11" FontAttributes="Bold" TextColor="{StaticResource MutedColor}"/>
+                        <Border Stroke="{StaticResource DividerColor}" StrokeThickness="1" StrokeShape="RoundRectangle 10" Background="{StaticResource Surface2Color}">
+                            <Entry x:Name="NameEntry" Placeholder="상품"
+                                   FontSize="15" FontAttributes="Bold"
+                                   TextColor="{StaticResource TextColor}"
+                                   PlaceholderColor="{StaticResource Muted2Color}"
+                                   ReturnType="Next"
+                                   BackgroundColor="Transparent" Margin="12,2"
+                                   Completed="OnNameCompleted"/>
+                        </Border>
+                    </VerticalStackLayout>
+
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
+                        <VerticalStackLayout Grid.Column="0" Spacing="4">
+                            <Label Text="정상가" FontSize="11" FontAttributes="Bold" TextColor="{StaticResource MutedColor}"/>
+                            <Border Stroke="{StaticResource DividerColor}" StrokeThickness="1" StrokeShape="RoundRectangle 10" Background="{StaticResource Surface2Color}">
+                                <Entry x:Name="OriginalEntry" Placeholder="0" Keyboard="Numeric" ReturnType="Next" FontSize="14" TextColor="{StaticResource TextColor}" PlaceholderColor="{StaticResource Muted2Color}" BackgroundColor="Transparent" Margin="12,2" Completed="OnOriginalCompleted" Unfocused="OnPriceUnfocused"/>
+                            </Border>
+                        </VerticalStackLayout>
+                        <VerticalStackLayout Grid.Column="1" Spacing="4">
+                            <Label Text="할인" FontSize="11" FontAttributes="Bold" TextColor="{StaticResource MutedColor}"/>
+                            <Border Stroke="{StaticResource DividerColor}" StrokeThickness="1" StrokeShape="RoundRectangle 10" Background="{StaticResource Surface2Color}">
+                                <Entry x:Name="DiscountEntry" Placeholder="0" Keyboard="Numeric" ReturnType="Next" FontSize="14" TextColor="{StaticResource TextColor}" PlaceholderColor="{StaticResource Muted2Color}" BackgroundColor="Transparent" Margin="12,2" Completed="OnDiscountCompleted" Unfocused="OnPriceUnfocused"/>
+                            </Border>
+                        </VerticalStackLayout>
+                    </Grid>
+
+                    <VerticalStackLayout Spacing="4">
+                        <Label Text="판매가 (합산 대상)" FontSize="11" FontAttributes="Bold" TextColor="{StaticResource PrimaryColor}"/>
+                        <Border Stroke="{StaticResource PrimaryColor}" StrokeThickness="1.5" StrokeShape="RoundRectangle 10" Background="{StaticResource AccentBgColor}">
+                            <Entry x:Name="SaleEntry" Placeholder="0" Keyboard="Numeric"
+                                   ReturnType="Done"
+                                   FontSize="22" FontAttributes="Bold" TextColor="{StaticResource TextColor}"
+                                   PlaceholderColor="{StaticResource Muted2Color}"
+                                   BackgroundColor="Transparent" Margin="12,4"
+                                   Completed="OnSaleCompleted" Unfocused="OnPriceUnfocused"/>
+                        </Border>
+                    </VerticalStackLayout>
+
+                    <Label x:Name="ConfidenceLabel" FontSize="11" TextColor="{StaticResource MutedColor}"/>
+
+                    <!-- Quantity stepper -->
+                    <Border Stroke="Transparent" Background="{StaticResource Surface2Color}" StrokeShape="RoundRectangle 12" Padding="14,8" Margin="0,4,0,0">
+                        <Grid ColumnDefinitions="*,Auto">
+                            <Label Grid.Column="0" Text="수량" FontSize="13" FontAttributes="Bold" TextColor="{StaticResource TextColor}" VerticalOptions="Center"/>
+                            <HorizontalStackLayout Grid.Column="1" Spacing="0">
+                                <Border Stroke="Transparent" Background="{StaticResource SurfaceColor}" StrokeShape="RoundRectangle 8" WidthRequest="36" HeightRequest="36">
+                                    <Label Text="−" FontSize="20" FontAttributes="Bold" TextColor="{StaticResource PrimaryColor}" HorizontalOptions="Center" VerticalOptions="Center">
+                                        <Label.GestureRecognizers>
+                                            <TapGestureRecognizer Tapped="OnQtyMinus"/>
+                                        </Label.GestureRecognizers>
+                                    </Label>
+                                </Border>
+                                <Label x:Name="QtyLabel" Text="1" FontSize="17" FontAttributes="Bold" TextColor="{StaticResource TextColor}" WidthRequest="48" HorizontalTextAlignment="Center" VerticalOptions="Center"/>
+                                <Border Stroke="Transparent" Background="{StaticResource SurfaceColor}" StrokeShape="RoundRectangle 8" WidthRequest="36" HeightRequest="36">
+                                    <Label Text="+" FontSize="20" FontAttributes="Bold" TextColor="{StaticResource PrimaryColor}" HorizontalOptions="Center" VerticalOptions="Center">
+                                        <Label.GestureRecognizers>
+                                            <TapGestureRecognizer Tapped="OnQtyPlus"/>
+                                        </Label.GestureRecognizers>
+                                    </Label>
+                                </Border>
+                            </HorizontalStackLayout>
+                        </Grid>
+                    </Border>
+
+                    <Grid ColumnDefinitions="*,2*" ColumnSpacing="10" Margin="0,4,0,0">
+                        <Button Grid.Column="0" Text="재촬영" BackgroundColor="{StaticResource SurfaceColor}" TextColor="{StaticResource MutedColor}"
+                                BorderColor="{StaticResource DividerColor}" BorderWidth="1" CornerRadius="12" HeightRequest="50"
+                                Clicked="OnCloseResult"/>
+                        <Button Grid.Column="1" Text="장바구니에 추가"
+                                Background="{StaticResource PrimaryBrush}"
+                                TextColor="White" FontAttributes="Bold"
+                                CornerRadius="12" HeightRequest="50"
+                                Clicked="OnAddClicked"/>
+                    </Grid>
+                </VerticalStackLayout>
+            </ScrollView>
+        </Border>
+    </Grid>
+
+</ContentPage>

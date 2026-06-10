@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ResourceDictionary xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
+
+    <!-- ===== MartCart design tokens (mirror of mockup/styles.css) ===== -->
+    <Color x:Key="BgColor">#F2F4F7</Color>
+    <Color x:Key="SurfaceColor">#FFFFFF</Color>
+    <Color x:Key="Surface2Color">#FAFBFC</Color>
+
+    <Color x:Key="PrimaryColor">#1E3A5F</Color>
+    <Color x:Key="Primary2Color">#264F80</Color>
+    <Color x:Key="AccentColor">#00A968</Color>
+    <Color x:Key="Accent2Color">#00D080</Color>
+    <Color x:Key="AccentBgColor">#E7F8EF</Color>
+    <Color x:Key="AccentBg2Color">#D1FAE5</Color>
+    <Color x:Key="AccentDarkColor">#047857</Color>
+
+    <Color x:Key="TextColor">#0F172A</Color>
+    <Color x:Key="MutedColor">#6B7280</Color>
+    <Color x:Key="Muted2Color">#9CA3AF</Color>
+
+    <Color x:Key="DividerColor">#E5E7EB</Color>
+    <Color x:Key="DividerSoftColor">#F1F5F9</Color>
+
+    <Color x:Key="DangerColor">#DC2626</Color>
+    <Color x:Key="WarnColor">#F59E0B</Color>
+    <Color x:Key="WarnBgColor">#FEF3C7</Color>
+    <Color x:Key="WarnBg2Color">#FFFBEB</Color>
+    <Color x:Key="WarnTextColor">#92400E</Color>
+
+    <!-- Item thumb backgrounds -->
+    <Color x:Key="ThumbFruitColor">#FEE2E2</Color>
+    <Color x:Key="ThumbGrainColor">#FEF3C7</Color>
+    <Color x:Key="ThumbDairyColor">#DBEAFE</Color>
+    <Color x:Key="ThumbDefaultColor">#EEF2F7</Color>
+
+    <!-- Gradients -->
+    <LinearGradientBrush x:Key="HeroBrush" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Color="#FFFFFF" Offset="0"/>
+        <GradientStop Color="#FAFBFC" Offset="1"/>
+    </LinearGradientBrush>
+    <LinearGradientBrush x:Key="PrimaryBrush" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Color="#264F80" Offset="0"/>
+        <GradientStop Color="#1E3A5F" Offset="1"/>
+    </LinearGradientBrush>
+    <LinearGradientBrush x:Key="ProgressBrush" StartPoint="0,0" EndPoint="1,0">
+        <GradientStop Color="#00A968" Offset="0"/>
+        <GradientStop Color="#00D080" Offset="1"/>
+    </LinearGradientBrush>
+    <LinearGradientBrush x:Key="BannerBrush" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Color="#FFFBEB" Offset="0"/>
+        <GradientStop Color="#FEF3C7" Offset="1"/>
+    </LinearGradientBrush>
+
+</ResourceDictionary>

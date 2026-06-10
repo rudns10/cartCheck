@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="456" height="456" viewBox="0 0 456 456" version="1.1" xmlns="http://www.w3.org/2000/svg">
+
+    <!-- Shopping cart outline -->
+    <g fill="none" stroke="#FFFFFF" stroke-width="34" stroke-linecap="round" stroke-linejoin="round">
+        <!-- Handle + top + sides + bottom -->
+        <path d="M 110 160 L 158 160 L 180 305 L 350 305 L 365 195 L 188 195"/>
+    </g>
+
+    <!-- Wheels -->
+    <circle cx="208" cy="355" r="22" fill="#FFFFFF"/>
+    <circle cx="328" cy="355" r="22" fill="#FFFFFF"/>
+
+    <!-- Check badge: white circle -->
+    <circle cx="305" cy="180" r="78" fill="#FFFFFF"/>
+
+    <!-- Checkmark inside badge -->
+    <path d="M 265 185 L 295 215 L 350 150"
+          fill="none" stroke="#2EBE6B" stroke-width="22" stroke-linecap="round" stroke-linejoin="round"/>
+
+</svg>

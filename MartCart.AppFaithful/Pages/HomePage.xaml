@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:controls="clr-namespace:MartCart.AppFaithful.Controls"
+             x:Class="MartCart.AppFaithful.Pages.HomePage"
+             BackgroundColor="{StaticResource BgColor}">
+
+    <Grid RowDefinitions="Auto,*,Auto">
+
+        <!-- ===== Top bar (logo only) ===== -->
+        <Grid Grid.Row="0" Padding="20,18,20,12">
+            <HorizontalStackLayout Spacing="0">
+                <Label Text="Cart" FontSize="22" FontAttributes="Bold" TextColor="{StaticResource TextColor}"/>
+                <Label Text="Check" FontSize="22" FontAttributes="Bold" TextColor="{StaticResource AccentColor}"/>
+            </HorizontalStackLayout>
+        </Grid>
+
+        <!-- ===== Scroll body ===== -->
+        <ScrollView Grid.Row="1" Padding="0,4,0,24">
+            <VerticalStackLayout Spacing="0">
+
+                <!-- ===== Active Cart Hero (deep navy gradient) ===== -->
+                <Border Margin="16,8,16,0" Background="{StaticResource ActiveCartBrush}" Stroke="Transparent" StrokeShape="RoundRectangle 22" Padding="22,22,22,24">
+                    <Border.Shadow>
+                        <Shadow Brush="#0F2A50" Offset="0,12" Radius="20" Opacity="0.32"/>
+                    </Border.Shadow>
+                    <Grid ColumnDefinitions="*,Auto">
+                        <VerticalStackLayout Grid.Column="0" Spacing="0">
+
+                            <!-- Pulse + label -->
+                            <HorizontalStackLayout Spacing="8">
+                                <Ellipse Fill="{StaticResource Accent2Color}" WidthRequest="8" HeightRequest="8" VerticalOptions="Center"/>
+                                <Label Text="진행 중인 장바구니" FontSize="11" FontAttributes="Bold" TextColor="White" Opacity="0.85" CharacterSpacing="0.5"/>
+                            </HorizontalStackLayout>
+
+                            <!-- Mart -->
+                            <Label x:Name="HomeMartLabel" Text="이마트 트레이더스" FontSize="20" FontAttributes="Bold" TextColor="White" Margin="0,6,0,0"/>
+
+                            <!-- Subtotal label -->
+                            <Label Text="현재 합산 · 실 구매가" FontSize="11" TextColor="White" Opacity="0.7" Margin="0,18,0,0"/>
+
+                            <!-- Amount -->
+                            <HorizontalStackLayout Spacing="3" Margin="0,2,0,0">
+                                <Label x:Name="HomeAmountLabel" Text="0" FontSize="38" FontAttributes="Bold" TextColor="White" LineHeight="1.1"/>
+                                <Label Text="원" FontSize="18" FontAttributes="Bold" TextColor="White" Opacity="0.8" VerticalOptions="End" Margin="0,0,0,6"/>
+                            </HorizontalStackLayout>
+
+                            <!-- Remaining row -->
+                            <Grid Margin="0,14,0,0" ColumnDefinitions="*,Auto">
+                                <Label Grid.Column="0" x:Name="HomeThresholdLabel" Text="목표 금액 50,000원까지" FontSize="12" TextColor="White" Opacity="0.8"/>
+                                <Label Grid.Column="1" x:Name="HomeRemainingLabel" Text="10,400원 남음" FontSize="13" FontAttributes="Bold" TextColor="{StaticResource Accent2Color}"/>
+                            </Grid>
+
+                            <!-- Discount reward row -->
+                            <Label x:Name="HomeDiscountLabel" Text="" FontSize="11" FontAttributes="Bold" TextColor="{StaticResource Accent3Color}" Margin="0,4,0,0" IsVisible="False"/>
+
+                            <!-- Progress -->
+                            <Border Stroke="Transparent" Background="#33FFFFFF" StrokeShape="RoundRectangle 4" HeightRequest="8" Margin="0,8,0,0">
+                                <Border x:Name="HomeProgressFill" Stroke="Transparent" Background="{StaticResource ProgressLightBrush}" StrokeShape="RoundRectangle 4" WidthRequest="220" HorizontalOptions="Start"/>
+                            </Border>
+
+                            <!-- Meta row -->
+                            <Grid Margin="0,14,0,0" ColumnDefinitions="*,Auto">
+                                <HorizontalStackLayout Grid.Column="0" Spacing="6">
+                                    <Label Text="정상가" FontSize="12" TextColor="White" Opacity="0.7" VerticalOptions="Center"/>
+                                    <Label x:Name="HomeSaleLabel" Text="0원" FontSize="13" FontAttributes="Bold" TextColor="White" VerticalOptions="Center"/>
+                                </HorizontalStackLayout>
+                                <Border x:Name="HomeSavedPill" Grid.Column="1" Stroke="Transparent" Background="#3800D080" StrokeShape="RoundRectangle 99" Padding="10,4" IsVisible="False">
+                                    <Label x:Name="HomeSavedLabel" Text="" FontSize="11" FontAttributes="Bold" TextColor="{StaticResource Accent3Color}"/>
+                                </Border>
+                            </Grid>
+
+                            <BoxView Color="White" Opacity="0.12" HeightRequest="1" Margin="0,14,0,0"/>
+                        </VerticalStackLayout>
+
+                        <!-- FAB -->
+                        <Border Grid.Column="1" Background="{StaticResource FabBrush}" Stroke="Transparent" StrokeShape="RoundRectangle 26"
+                                WidthRequest="52" HeightRequest="52" VerticalOptions="Center" Margin="14,0,0,0">
+                            <Border.Shadow>
+                                <Shadow Brush="#00A968" Offset="0,6" Radius="14" Opacity="0.5"/>
+                            </Border.Shadow>
+                            <Label Text="▶" FontSize="18" FontAttributes="Bold" TextColor="White" HorizontalOptions="Center" VerticalOptions="Center"/>
+                        </Border>
+                    </Grid>
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnActiveCartTapped"/>
+                    </Border.GestureRecognizers>
+                </Border>
+
+                <!-- ===== Banner ad slot (populated at runtime by AdProvider) ===== -->
+                <ContentView x:Name="AdSlot" Margin="20,14,20,0"/>
+
+                <!-- ===== Month stats card ===== -->
+                <Border Margin="16,18,16,0" Background="{StaticResource SurfaceColor}" Stroke="Transparent" StrokeShape="RoundRectangle 18" Padding="0,16">
+                    <Border.Shadow>
+                        <Shadow Brush="#0A1F33" Offset="0,2" Radius="6" Opacity="0.06"/>
+                    </Border.Shadow>
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnStatsTapped"/>
+                    </Border.GestureRecognizers>
+                    <VerticalStackLayout Spacing="4">
+                        <Label x:Name="MonthSummaryTitle" Margin="20,0,0,4" FontSize="12" FontAttributes="Bold" TextColor="{StaticResource MutedColor}"/>
+                        <Grid ColumnDefinitions="*,1,*,1,*">
+                            <VerticalStackLayout Grid.Column="0" Spacing="3" HorizontalOptions="Center" Padding="0,10">
+                                <Label x:Name="MonthSpentLabel" Text="0" FontSize="20" FontAttributes="Bold" TextColor="{StaticResource TextColor}" HorizontalOptions="Center"/>
+                                <Label Text="실 구매 (원)" FontSize="10" TextColor="{StaticResource MutedColor}" HorizontalOptions="Center"/>
+                            </VerticalStackLayout>
+                            <BoxView Grid.Column="1" Color="{StaticResource DividerSoftColor}" Margin="0,8"/>
+                            <VerticalStackLayout Grid.Column="2" Spacing="3" HorizontalOptions="Center" Padding="0,10">
+                                <Label x:Name="MonthCountLabel" Text="0" FontSize="20" FontAttributes="Bold" TextColor="{StaticResource TextColor}" HorizontalOptions="Center"/>
+                                <Label Text="장보기 (회)" FontSize="10" TextColor="{StaticResource MutedColor}" HorizontalOptions="Center"/>
+                            </VerticalStackLayout>
+                            <BoxView Grid.Column="3" Color="{StaticResource DividerSoftColor}" Margin="0,8"/>
+                            <VerticalStackLayout Grid.Column="4" Spacing="3" HorizontalOptions="Center" Padding="0,10">
+                                <Label x:Name="MonthSavedLabel" Text="0" FontSize="20" FontAttributes="Bold" TextColor="{StaticResource AccentColor}" HorizontalOptions="Center"/>
+                                <Label Text="절약 (원)" FontSize="10" TextColor="{StaticResource MutedColor}" HorizontalOptions="Center"/>
+                            </VerticalStackLayout>
+                        </Grid>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- ===== Recent carts header ===== -->
+                <Grid Margin="24,24,24,12" ColumnDefinitions="*,Auto">
+                    <Label Grid.Column="0" Text="최근 장바구니" FontSize="15" FontAttributes="Bold" TextColor="{StaticResource TextColor}"/>
+                    <Label Grid.Column="1" Text="전체 →" FontSize="12" FontAttributes="Bold" TextColor="{StaticResource MutedColor}" VerticalOptions="Center">
+                        <Label.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnHistoryTapped"/>
+                        </Label.GestureRecognizers>
+                    </Label>
+                </Grid>
+
+                <!-- ===== Recent carts list (dynamic) ===== -->
+                <Border x:Name="RecentEmpty" Margin="16,0,16,16" Background="{StaticResource SurfaceColor}" Stroke="Transparent" StrokeShape="RoundRectangle 18" Padding="20,28" IsVisible="False">
+                    <Border.Shadow>
+                        <Shadow Brush="#0A1F33" Offset="0,2" Radius="6" Opacity="0.06"/>
+                    </Border.Shadow>
+                    <VerticalStackLayout Spacing="6" HorizontalOptions="Center">
+                        <Label Text="📭" FontSize="32" HorizontalOptions="Center"/>
+                        <Label Text="아직 종료된 장바구니가 없어요" FontSize="13" FontAttributes="Bold" TextColor="{StaticResource TextColor}" HorizontalTextAlignment="Center"/>
+                        <Label Text="진행 중인 장바구니의 ⋮ → 장보기 종료" FontSize="11" TextColor="{StaticResource MutedColor}" HorizontalTextAlignment="Center"/>
+                    </VerticalStackLayout>
+                </Border>
+
+                <Border x:Name="RecentList" Margin="16,0,16,16" Background="{StaticResource SurfaceColor}" Stroke="Transparent" StrokeShape="RoundRectangle 18">
+                    <Border.Shadow>
+                        <Shadow Brush="#0A1F33" Offset="0,2" Radius="6" Opacity="0.06"/>
+                    </Border.Shadow>
+                    <CollectionView x:Name="RecentCollection" SelectionMode="None">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate>
+                                <Grid Padding="18,16" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="14">
+                                    <Grid.GestureRecognizers>
+                                        <TapGestureRecognizer Tapped="OnRecentCartTapped"/>
+                                    </Grid.GestureRecognizers>
+                                    <Border Grid.Column="0" Stroke="Transparent" Background="#EEF2F7" StrokeShape="RoundRectangle 12" WidthRequest="42" HeightRequest="42">
+                                        <Label Text="🛒" FontSize="18" HorizontalOptions="Center" VerticalOptions="Center"/>
+                                    </Border>
+                                    <VerticalStackLayout Grid.Column="1" Spacing="3" VerticalOptions="Center">
+                                        <HorizontalStackLayout Spacing="6">
+                                            <Label Text="{Binding Mart}" FontSize="14" FontAttributes="Bold" TextColor="{StaticResource TextColor}"/>
+                                            <Border Stroke="Transparent" Background="{StaticResource AccentColor}" StrokeShape="RoundRectangle 8" WidthRequest="16" HeightRequest="16" VerticalOptions="Center" IsVisible="{Binding ThresholdReached}">
+                                                <Label Text="✓" FontSize="9" FontAttributes="Bold" TextColor="White" HorizontalOptions="Center" VerticalOptions="Center"/>
+                                            </Border>
+                                        </HorizontalStackLayout>
+                                        <Label Text="{Binding Subtitle}" FontSize="11" TextColor="{StaticResource MutedColor}"/>
+                                    </VerticalStackLayout>
+                                    <VerticalStackLayout Grid.Column="2" Spacing="4" VerticalOptions="Center">
+                                        <Label Text="{Binding SaleText}" FontSize="15" FontAttributes="Bold" TextColor="{StaticResource TextColor}" HorizontalOptions="End"/>
+                                        <Border Stroke="Transparent" Background="{StaticResource AccentBgColor}" StrokeShape="RoundRectangle 8" Padding="7,2" HorizontalOptions="End" IsVisible="{Binding HasSaved}">
+                                            <Label Text="{Binding SavedText}" FontSize="10" FontAttributes="Bold" TextColor="{StaticResource AccentColor}"/>
+                                        </Border>
+                                    </VerticalStackLayout>
+                                </Grid>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </Border>
+
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <controls:BottomNav Grid.Row="2" Active="home"/>
+
+    </Grid>
+
+</ContentPage>

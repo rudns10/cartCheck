@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="MartCart.AppFaithful.Pages.PinLockPage"
+             BackgroundColor="{StaticResource BgColor}">
+
+    <Grid RowDefinitions="*,Auto,Auto" Padding="32,80,32,40">
+
+        <!-- ====== Brand + dots ====== -->
+        <VerticalStackLayout Grid.Row="0" Spacing="0" VerticalOptions="Center" HorizontalOptions="Center">
+
+            <Border WidthRequest="72" HeightRequest="72" StrokeShape="RoundRectangle 18"
+                    Stroke="Transparent" HorizontalOptions="Center" Margin="0,0,0,16">
+                <Border.Background>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                        <GradientStop Color="#5BD68A" Offset="0"/>
+                        <GradientStop Color="#2EBE6B" Offset="1"/>
+                    </LinearGradientBrush>
+                </Border.Background>
+                <Border.Shadow>
+                    <Shadow Brush="#16A34A" Offset="0,8" Radius="16" Opacity="0.32"/>
+                </Border.Shadow>
+                <Grid WidthRequest="72" HeightRequest="72">
+                    <Path Stroke="White" StrokeThickness="5" StrokeLineCap="Round" StrokeLineJoin="Round"
+                          Data="M 17.4 25.3 L 25.0 25.3 L 28.4 48.2 L 55.3 48.2 L 57.6 30.8 L 29.7 30.8"/>
+                    <Ellipse Fill="White" WidthRequest="7" HeightRequest="7" HorizontalOptions="Start" VerticalOptions="Start" Margin="29.3,52.6,0,0"/>
+                    <Ellipse Fill="White" WidthRequest="7" HeightRequest="7" HorizontalOptions="Start" VerticalOptions="Start" Margin="48.3,52.6,0,0"/>
+                    <Ellipse Fill="White" WidthRequest="24.6" HeightRequest="24.6" HorizontalOptions="Start" VerticalOptions="Start" Margin="35.9,16.1,0,0"/>
+                    <Path Stroke="#2EBE6B" StrokeThickness="3.5" StrokeLineCap="Round" StrokeLineJoin="Round"
+                          Data="M 41.9 29.2 L 46.6 33.9 L 55.3 23.7"/>
+                </Grid>
+            </Border>
+
+            <Label Text="CartCheck" FontSize="22" FontAttributes="Bold" TextColor="{StaticResource TextColor}" HorizontalTextAlignment="Center"/>
+
+            <Label x:Name="TitleLabel" Text="PIN을 입력하세요" FontSize="14" FontAttributes="Bold"
+                   TextColor="{StaticResource TextColor}" Margin="0,28,0,4" HorizontalTextAlignment="Center"/>
+            <Label x:Name="SubLabel" Text="잠금 해제하려면 4자리 PIN을 입력하세요" FontSize="11"
+                   TextColor="{StaticResource MutedColor}" HorizontalTextAlignment="Center"/>
+
+            <HorizontalStackLayout x:Name="DotsRow" Spacing="18" HorizontalOptions="Center" Margin="0,28,0,0">
+                <Ellipse x:Name="D0" WidthRequest="16" HeightRequest="16" Stroke="{StaticResource DividerColor}" StrokeThickness="2" Fill="Transparent"/>
+                <Ellipse x:Name="D1" WidthRequest="16" HeightRequest="16" Stroke="{StaticResource DividerColor}" StrokeThickness="2" Fill="Transparent"/>
+                <Ellipse x:Name="D2" WidthRequest="16" HeightRequest="16" Stroke="{StaticResource DividerColor}" StrokeThickness="2" Fill="Transparent"/>
+                <Ellipse x:Name="D3" WidthRequest="16" HeightRequest="16" Stroke="{StaticResource DividerColor}" StrokeThickness="2" Fill="Transparent"/>
+            </HorizontalStackLayout>
+
+        </VerticalStackLayout>
+
+        <!-- ====== Keypad ====== -->
+        <Grid Grid.Row="1" ColumnDefinitions="*,*,*" RowDefinitions="Auto,Auto,Auto,Auto" ColumnSpacing="16" RowSpacing="14" Margin="0,0,0,12">
+
+            <Border Grid.Column="0" Grid.Row="0" Background="{StaticResource SurfaceColor}" Stroke="Transparent" StrokeShape="RoundRectangle 32" HeightRequest="64">
+                <Border.GestureRecognizers><TapGestureRecognizer Tapped="OnKeyTapped" CommandParameter="1"/></Border.GestureRecognizers>
+                <Border.Shadow><Shadow Brush="#0A1F33" Offset="0,2" Radius="6" Opacity="0.06"/></Border.Shadow>
+                <Label Text="1" FontSize="26" FontAttributes="Bold" HorizontalOptions="Center" VerticalOptions="Center" InputTransparent="True"/>
+            </Border>
+            <Border Grid.Column="1" Grid.Row="0" Background="{StaticResource SurfaceColor}" Stroke="Transparent" StrokeShape="RoundRectangle 32" HeightRequest="64">
+                <Border.GestureRecognizers><TapGestureRecognizer Tapped="OnKeyTapped" CommandParameter="2"/></Border.GestureRecognizers>
+                <Border.Shadow><Shadow Brush="#0A1F33" Offset="0,2" Radius="6" Opacity="0.06"/></Border.Shadow>
+                <Label Text="2" FontSize="26" FontAttributes="Bold" HorizontalOptions="Center" VerticalOptions="Center" InputTransparent="True"/>
+            </Border>
+            <Border Grid.Column="2" Grid.Row="0" Background="{StaticResource SurfaceColor}" Stroke="Transparent" StrokeShape="RoundRectangle 32" HeightRequest="64">
+                <Border.GestureRecognizers><TapGestureRecognizer Tapped="OnKeyTapped" CommandParameter="3"/></Border.GestureRecognizers>
+                <Border.Shadow><Shadow Brush="#0A1F33" Offset="0,2" Radius="6" Opacity="0.06"/></Border.Shadow>
+                <Label Text="3" FontSize="26" FontAttributes="Bold" HorizontalOptions="Center" VerticalOptions="Center" InputTransparent="True"/>
+            </Border>
+
+            <Border Grid.Column="0" Grid.Row="1" Background="{StaticResource SurfaceColor}" Stroke="Transparent" StrokeShape="RoundRectangle 32" HeightRequest="64">
+                <Border.GestureRecognizers><TapGestureRecognizer Tapped="OnKeyTapped" CommandParameter="4"/></Border.GestureRecognizers>
+                <Border.Shadow><Shadow Brush="#0A1F33" Offset="0,2" Radius="6" Opacity="0.06"/></Border.Shadow>
+                <Label Text="4" FontSize="26" FontAttributes="Bold" HorizontalOptions="Center" VerticalOptions="Center" InputTransparent="True"/>
+            </Border>
+            <Border Grid.Column="1" Grid.Row="1" Background="{StaticResource SurfaceColor}" Stroke="Transparent" StrokeShape="RoundRectangle 32" HeightRequest="64">
+                <Border.GestureRecognizers><TapGestureRecognizer Tapped="OnKeyTapped" CommandParameter="5"/></Border.GestureRecognizers>
+                <Border.Shadow><Shadow Brush="#0A1F33" Offset="0,2" Radius="6" Opacity="0.06"/></Border.Shadow>
+                <Label Text="5" FontSize="26" FontAttributes="Bold" HorizontalOptions="Center" VerticalOptions="Center" InputTransparent="True"/>
+            </Border>
+            <Border Grid.Column="2" Grid.Row="1" Background="{StaticResource SurfaceColor}" Stroke="Transparent" StrokeShape="RoundRectangle 32" HeightRequest="64">
+                <Border.GestureRecognizers><TapGestureRecognizer Tapped="OnKeyTapped" CommandParameter="6"/></Border.GestureRecognizers>
+                <Border.Shadow><Shadow Brush="#0A1F33" Offset="0,2" Radius="6" Opacity="0.06"/></Border.Shadow>
+                <Label Text="6" FontSize="26" FontAttributes="Bold" HorizontalOptions="Center" VerticalOptions="Center" InputTransparent="True"/>
+            </Border>
+
+            <Border Grid.Column="0" Grid.Row="2" Background="{StaticResource SurfaceColor}" Stroke="Transparent" StrokeShape="RoundRectangle 32" HeightRequest="64">
+                <Border.GestureRecognizers><TapGestureRecognizer Tapped="OnKeyTapped" CommandParameter="7"/></Border.GestureRecognizers>
+                <Border.Shadow><Shadow Brush="#0A1F33" Offset="0,2" Radius="6" Opacity="0.06"/></Border.Shadow>
+                <Label Text="7" FontSize="26" FontAttributes="Bold" HorizontalOptions="Center" VerticalOptions="Center" InputTransparent="True"/>
+            </Border>
+            <Border Grid.Column="1" Grid.Row="2" Background="{StaticResource SurfaceColor}" Stroke="Transparent" StrokeShape="RoundRectangle 32" HeightRequest="64">
+                <Border.GestureRecognizers><TapGestureRecognizer Tapped="OnKeyTapped" CommandParameter="8"/></Border.GestureRecognizers>
+                <Border.Shadow><Shadow Brush="#0A1F33" Offset="0,2" Radius="6" Opacity="0.06"/></Border.Shadow>
+                <Label Text="8" FontSize="26" FontAttributes="Bold" HorizontalOptions="Center" VerticalOptions="Center" InputTransparent="True"/>
+            </Border>
+            <Border Grid.Column="2" Grid.Row="2" Background="{StaticResource SurfaceColor}" Stroke="Transparent" StrokeShape="RoundRectangle 32" HeightRequest="64">
+                <Border.GestureRecognizers><TapGestureRecognizer Tapped="OnKeyTapped" CommandParameter="9"/></Border.GestureRecognizers>
+                <Border.Shadow><Shadow Brush="#0A1F33" Offset="0,2" Radius="6" Opacity="0.06"/></Border.Shadow>
+                <Label Text="9" FontSize="26" FontAttributes="Bold" HorizontalOptions="Center" VerticalOptions="Center" InputTransparent="True"/>
+            </Border>
+
+            <!-- Empty slot (was biometric button) -->
+            <Border Grid.Column="0" Grid.Row="3" Background="Transparent" Stroke="Transparent" HeightRequest="64"/>
+            <Border Grid.Column="1" Grid.Row="3" Background="{StaticResource SurfaceColor}" Stroke="Transparent" StrokeShape="RoundRectangle 32" HeightRequest="64">
+                <Border.GestureRecognizers><TapGestureRecognizer Tapped="OnKeyTapped" CommandParameter="0"/></Border.GestureRecognizers>
+                <Border.Shadow><Shadow Brush="#0A1F33" Offset="0,2" Radius="6" Opacity="0.06"/></Border.Shadow>
+                <Label Text="0" FontSize="26" FontAttributes="Bold" HorizontalOptions="Center" VerticalOptions="Center" InputTransparent="True"/>
+            </Border>
+            <Border Grid.Column="2" Grid.Row="3" Background="Transparent" Stroke="Transparent" HeightRequest="64">
+                <Border.GestureRecognizers><TapGestureRecognizer Tapped="OnDeleteTapped"/></Border.GestureRecognizers>
+                <Label Text="⌫" FontSize="22" TextColor="{StaticResource MutedColor}" HorizontalOptions="Center" VerticalOptions="Center" InputTransparent="True"/>
+            </Border>
+        </Grid>
+
+        <!-- ====== Bottom: forgot link ====== -->
+        <Label Grid.Row="2" x:Name="ForgotLabel" Text="PIN을 잊으셨나요?" FontSize="12"
+               TextColor="{StaticResource MutedColor}" HorizontalTextAlignment="Center">
+            <Label.GestureRecognizers>
+                <TapGestureRecognizer Tapped="OnForgotTapped"/>
+            </Label.GestureRecognizers>
+        </Label>
+
+        <!-- ====== Lockout overlay ====== -->
+        <Border x:Name="LockoutOverlay" IsVisible="False"
+                Grid.Row="0" Grid.RowSpan="3"
+                Background="#F2FFFFFF" Stroke="Transparent">
+            <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center" Spacing="14">
+                <Border Background="#FEE2E2" Stroke="Transparent" StrokeShape="RoundRectangle 36" WidthRequest="72" HeightRequest="72">
+                    <Label Text="🔒" FontSize="32" HorizontalOptions="Center" VerticalOptions="Center"/>
+                </Border>
+                <Label Text="잠시 후 다시 시도해주세요" FontSize="16" FontAttributes="Bold" TextColor="{StaticResource TextColor}" HorizontalTextAlignment="Center"/>
+                <Label Text="5회 연속 잘못 입력하셨습니다" FontSize="12" TextColor="{StaticResource MutedColor}" HorizontalTextAlignment="Center"/>
+                <Label x:Name="CountdownLabel" Text="30" FontSize="42" FontAttributes="Bold" TextColor="{StaticResource DangerColor}" HorizontalOptions="Center"/>
+                <Label Text="초 후 자동으로 다시 시도할 수 있어요" FontSize="11" TextColor="{StaticResource MutedColor}" HorizontalTextAlignment="Center"/>
+            </VerticalStackLayout>
+        </Border>
+
+    </Grid>
+
+</ContentPage>

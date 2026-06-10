@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ResourceDictionary xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
+
+    <!-- ===== Surfaces ===== -->
+    <Color x:Key="BgColor">#0B1220</Color>
+    <Color x:Key="SurfaceColor">#111827</Color>
+    <Color x:Key="Surface2Color">#0F172A</Color>
+
+    <!-- ===== Brand ===== -->
+    <Color x:Key="PrimaryColor">#3B82F6</Color>
+    <Color x:Key="Primary2Color">#60A5FA</Color>
+    <Color x:Key="PrimaryDeepColor">#1E3A5F</Color>
+    <Color x:Key="AccentColor">#10B981</Color>
+    <Color x:Key="Accent2Color">#34D399</Color>
+    <Color x:Key="Accent3Color">#6EE7B7</Color>
+    <Color x:Key="AccentBgColor">#0E2E22</Color>
+    <Color x:Key="AccentBg2Color">#0F3A2A</Color>
+    <Color x:Key="AccentDarkColor">#34D399</Color>
+
+    <!-- ===== Text ===== -->
+    <Color x:Key="TextColor">#F1F5F9</Color>
+    <Color x:Key="MutedColor">#9CA3AF</Color>
+    <Color x:Key="Muted2Color">#6B7280</Color>
+
+    <!-- ===== Lines ===== -->
+    <Color x:Key="DividerColor">#1F2937</Color>
+    <Color x:Key="DividerSoftColor">#1F2937</Color>
+
+    <!-- ===== States ===== -->
+    <Color x:Key="DangerColor">#F87171</Color>
+    <Color x:Key="DangerBgColor">#3F1212</Color>
+    <Color x:Key="WarnColor">#FBBF24</Color>
+    <Color x:Key="WarnBgColor">#3F2D08</Color>
+    <Color x:Key="WarnBg2Color">#2F2107</Color>
+    <Color x:Key="WarnTextColor">#FCD34D</Color>
+
+    <!-- ===== Item thumb backgrounds ===== -->
+    <Color x:Key="ThumbFruitColor">#3F1212</Color>
+    <Color x:Key="ThumbGrainColor">#3F2D08</Color>
+    <Color x:Key="ThumbDairyColor">#0F2540</Color>
+    <Color x:Key="ThumbDefaultColor">#1F2937</Color>
+
+    <!-- ===== Gradients ===== -->
+    <LinearGradientBrush x:Key="HeroBrush" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Color="#1F2937" Offset="0"/>
+        <GradientStop Color="#111827" Offset="1"/>
+    </LinearGradientBrush>
+    <LinearGradientBrush x:Key="PrimaryBrush" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Color="#1E3A5F" Offset="0"/>
+        <GradientStop Color="#0F2540" Offset="1"/>
+    </LinearGradientBrush>
+    <LinearGradientBrush x:Key="ActiveCartBrush" StartPoint="0,0" EndPoint="1,1">
+        <GradientStop Color="#1E3A5F" Offset="0"/>
+        <GradientStop Color="#15294A" Offset="0.6"/>
+        <GradientStop Color="#0B1220" Offset="1"/>
+    </LinearGradientBrush>
+    <LinearGradientBrush x:Key="ProgressBrush" StartPoint="0,0" EndPoint="1,0">
+        <GradientStop Color="#10B981" Offset="0"/>
+        <GradientStop Color="#34D399" Offset="1"/>
+    </LinearGradientBrush>
+    <LinearGradientBrush x:Key="ProgressLightBrush" StartPoint="0,0" EndPoint="1,0">
+        <GradientStop Color="#34D399" Offset="0"/>
+        <GradientStop Color="#6EE7B7" Offset="1"/>
+    </LinearGradientBrush>
+    <LinearGradientBrush x:Key="BannerBrush" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Color="#2F2107" Offset="0"/>
+        <GradientStop Color="#3F2D08" Offset="1"/>
+    </LinearGradientBrush>
+    <LinearGradientBrush x:Key="FabBrush" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Color="#34D399" Offset="0"/>
+        <GradientStop Color="#10B981" Offset="1"/>
+    </LinearGradientBrush>
+
+</ResourceDictionary>

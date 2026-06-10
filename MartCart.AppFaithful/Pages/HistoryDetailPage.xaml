@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="MartCart.AppFaithful.Pages.HistoryDetailPage"
+             BackgroundColor="{StaticResource BgColor}"
+             Shell.TabBarIsVisible="False"
+             Shell.NavBarIsVisible="False">
+
+    <Grid RowDefinitions="Auto,*">
+
+        <!-- App bar -->
+        <Grid Grid.Row="0" Padding="20,18,20,14" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="6" BackgroundColor="{StaticResource SurfaceColor}">
+            <Label Grid.Column="0" Text="←" FontSize="22" TextColor="{StaticResource TextColor}" VerticalOptions="Center" Padding="4,0,8,0">
+                <Label.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnBackTapped"/>
+                </Label.GestureRecognizers>
+            </Label>
+            <VerticalStackLayout Grid.Column="1" Spacing="2">
+                <Label x:Name="HeaderDateLabel" Text="" FontSize="12" TextColor="{StaticResource MutedColor}"/>
+                <Label x:Name="HeaderMartLabel" Text="" FontSize="18" FontAttributes="Bold" TextColor="{StaticResource TextColor}"/>
+            </VerticalStackLayout>
+            <Border Grid.Column="2" Stroke="Transparent" Background="{StaticResource DividerSoftColor}" StrokeShape="RoundRectangle 99" Padding="10,4" VerticalOptions="Center">
+                <Label Text="🔒 읽기 전용" FontSize="11" FontAttributes="Bold" TextColor="{StaticResource MutedColor}"/>
+            </Border>
+        </Grid>
+
+        <!-- Scroll body -->
+        <ScrollView Grid.Row="1" Padding="0,14,0,24">
+            <VerticalStackLayout Spacing="14">
+
+                <!-- Summary card -->
+                <Border Margin="16,0" Background="{StaticResource HeroBrush}" Stroke="Transparent" StrokeShape="RoundRectangle 20" Padding="22">
+                    <Border.Shadow>
+                        <Shadow Brush="#0A1F33" Offset="0,6" Radius="14" Opacity="0.10"/>
+                    </Border.Shadow>
+                    <VerticalStackLayout Spacing="0">
+
+                        <HorizontalStackLayout Spacing="10">
+                            <Label Text="실 구매가" FontSize="12" FontAttributes="Bold" TextColor="{StaticResource MutedColor}" VerticalOptions="Center"/>
+                            <Border x:Name="ReachedBadge" Stroke="Transparent" Background="{StaticResource AccentBgColor}" StrokeShape="RoundRectangle 9" Padding="10,3" VerticalOptions="Center" IsVisible="False">
+                                <Label Text="✓ 목표 금액 도달" FontSize="10" FontAttributes="Bold" TextColor="{StaticResource AccentDarkColor}"/>
+                            </Border>
+                        </HorizontalStackLayout>
+
+                        <HorizontalStackLayout Spacing="6" Margin="0,8,0,0">
+                            <Label x:Name="SaleLabel" Text="0" FontSize="40" FontAttributes="Bold" TextColor="{StaticResource TextColor}" LineHeight="1"/>
+                            <Label Text="원" FontSize="20" FontAttributes="Bold" TextColor="{StaticResource MutedColor}" VerticalOptions="End" Margin="0,0,0,8"/>
+                        </HorizontalStackLayout>
+
+                        <BoxView Color="#EEF2F7" HeightRequest="1" Margin="0,14,0,12"/>
+
+                        <Grid ColumnDefinitions="*,*,*">
+                            <VerticalStackLayout Grid.Column="0" Spacing="2">
+                                <Label Text="정상가" FontSize="11" TextColor="{StaticResource MutedColor}"/>
+                                <Label x:Name="OriginalLabel" Text="0원" FontSize="14" FontAttributes="Bold" TextColor="{StaticResource TextColor}"/>
+                            </VerticalStackLayout>
+                            <VerticalStackLayout Grid.Column="1" Spacing="2">
+                                <Label Text="절약" FontSize="11" TextColor="{StaticResource MutedColor}"/>
+                                <Label x:Name="SavedLabel" Text="0원" FontSize="14" FontAttributes="Bold" TextColor="{StaticResource AccentColor}"/>
+                            </VerticalStackLayout>
+                            <VerticalStackLayout Grid.Column="2" Spacing="2">
+                                <Label Text="목표 금액" FontSize="11" TextColor="{StaticResource MutedColor}"/>
+                                <Label x:Name="ThresholdLabel" Text="—" FontSize="14" FontAttributes="Bold" TextColor="{StaticResource TextColor}"/>
+                            </VerticalStackLayout>
+                        </Grid>
+
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Items header -->
+                <Grid Padding="24,8,24,0" ColumnDefinitions="Auto,Auto,*">
+                    <Label Grid.Column="0" Text="담은 항목" FontSize="14" FontAttributes="Bold" TextColor="{StaticResource TextColor}" VerticalOptions="Center"/>
+                    <Border Grid.Column="1" Stroke="Transparent" Background="{StaticResource TextColor}" StrokeShape="RoundRectangle 9" Padding="9,2" Margin="8,0,0,0" VerticalOptions="Center">
+                        <Label x:Name="ItemCountBadge" Text="0" FontSize="11" FontAttributes="Bold" TextColor="White"/>
+                    </Border>
+                </Grid>
+
+                <!-- Items list -->
+                <Border Margin="16,0" Background="{StaticResource SurfaceColor}" Stroke="Transparent" StrokeShape="RoundRectangle 18">
+                    <Border.Shadow>
+                        <Shadow Brush="#0A1F33" Offset="0,2" Radius="6" Opacity="0.06"/>
+                    </Border.Shadow>
+                    <CollectionView x:Name="ItemsCollection" SelectionMode="None">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate>
+                                <Grid Padding="18,14" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="14">
+                                    <Border Grid.Column="0" Stroke="Transparent" Background="{StaticResource ThumbDefaultColor}" StrokeShape="RoundRectangle 11" WidthRequest="40" HeightRequest="40">
+                                        <Label Text="🛍️" FontSize="20" HorizontalOptions="Center" VerticalOptions="Center"/>
+                                    </Border>
+                                    <VerticalStackLayout Grid.Column="1" Spacing="3" VerticalOptions="Center">
+                                        <Label Text="{Binding Name}" FontSize="14" FontAttributes="Bold" TextColor="{StaticResource TextColor}" LineBreakMode="TailTruncation"/>
+                                        <Label FontSize="11" TextColor="{StaticResource MutedColor}">
+                                            <Label.Text>
+                                                <MultiBinding StringFormat="{}{0:N0}원 × {1}">
+                                                    <Binding Path="SalePrice"/>
+                                                    <Binding Path="Quantity"/>
+                                                </MultiBinding>
+                                            </Label.Text>
+                                        </Label>
+                                    </VerticalStackLayout>
+                                    <Label Grid.Column="2" Text="{Binding SaleLineTotal, StringFormat='{0:N0}원'}" FontSize="15" FontAttributes="Bold" TextColor="{StaticResource TextColor}" VerticalOptions="Center"/>
+                                </Grid>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </Border>
+
+                <Label x:Name="NotFoundLabel" Text="기록을 찾을 수 없어요" IsVisible="False" FontSize="13" TextColor="{StaticResource MutedColor}" HorizontalTextAlignment="Center" Margin="0,40,0,0"/>
+
+            </VerticalStackLayout>
+        </ScrollView>
+
+    </Grid>
+
+</ContentPage>

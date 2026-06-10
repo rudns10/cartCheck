@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 390 820" width="390" height="820"
+     font-family="Pretendard, -apple-system, 'Segoe UI', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif">
+
+  <rect width="390" height="820" fill="#F7F8FA"/>
+
+  <!-- Status bar -->
+  <rect width="390" height="44" fill="#F7F8FA"/>
+  <text x="24" y="28" font-size="14" font-weight="600" fill="#1A1A1A">9:41</text>
+  <g transform="translate(330,18)" fill="#1A1A1A">
+    <rect x="0" y="2" width="4" height="8" rx="1"/>
+    <rect x="6" y="0" width="4" height="10" rx="1"/>
+    <rect x="12" y="-2" width="4" height="12" rx="1"/>
+    <rect x="22" y="0" width="22" height="10" rx="2" fill="none" stroke="#1A1A1A" stroke-width="1"/>
+    <rect x="24" y="2" width="16" height="6" rx="1"/>
+  </g>
+
+  <!-- App bar -->
+  <rect x="0" y="44" width="390" height="56" fill="#F7F8FA"/>
+  <text x="24" y="80" font-size="22" font-weight="800" fill="#1A1A1A">통계</text>
+
+  <!-- ===== Period chips ===== -->
+  <rect x="20" y="116" width="76" height="36" rx="18" fill="#1E3A5F"/>
+  <text x="58" y="139" font-size="13" font-weight="700" fill="#FFFFFF" text-anchor="middle">이번 달</text>
+
+  <rect x="104" y="116" width="76" height="36" rx="18" fill="#FFFFFF" stroke="#E5E7EB" stroke-width="1"/>
+  <text x="142" y="139" font-size="13" font-weight="600" fill="#6B7280" text-anchor="middle">지난 달</text>
+
+  <rect x="188" y="116" width="100" height="36" rx="18" fill="#FFFFFF" stroke="#E5E7EB" stroke-width="1"/>
+  <text x="238" y="139" font-size="13" font-weight="600" fill="#6B7280" text-anchor="middle">사용자 지정</text>
+
+  <!-- ===== 2×2 metric grid ===== -->
+  <!-- Card 1: 총 지출 (Hero) -->
+  <rect x="20" y="172" width="170" height="120" rx="16" fill="#FFFFFF"/>
+  <text x="40" y="200" font-size="12" font-weight="600" fill="#6B7280">총 지출</text>
+  <text x="40" y="244" font-size="26" font-weight="800" fill="#1A1A1A"
+        font-feature-settings="'tnum'" letter-spacing="-0.5">156,200</text>
+  <text x="40" y="266" font-size="12" fill="#6B7280">원 · 이번 달</text>
+  <g transform="translate(40,278)" fill="#00A968">
+    <path d="M 0 5 L 4 1 L 8 5" stroke="#00A968" stroke-width="1.5" fill="none"/>
+  </g>
+  <text x="54" y="284" font-size="11" font-weight="700" fill="#00A968">12% ↑ 전월 대비</text>
+
+  <!-- Card 2: 장보기 횟수 -->
+  <rect x="200" y="172" width="170" height="120" rx="16" fill="#FFFFFF"/>
+  <text x="220" y="200" font-size="12" font-weight="600" fill="#6B7280">장보기 횟수</text>
+  <text x="220" y="244" font-size="26" font-weight="800" fill="#1A1A1A"
+        font-feature-settings="'tnum'" letter-spacing="-0.5">5</text>
+  <text x="252" y="244" font-size="14" fill="#6B7280">번</text>
+  <text x="220" y="266" font-size="12" fill="#6B7280">평균 6.2일 간격</text>
+
+  <!-- Card 3: 평균 객단가 -->
+  <rect x="20" y="304" width="170" height="120" rx="16" fill="#FFFFFF"/>
+  <text x="40" y="332" font-size="12" font-weight="600" fill="#6B7280">평균 객단가</text>
+  <text x="40" y="376" font-size="26" font-weight="800" fill="#1A1A1A"
+        font-feature-settings="'tnum'" letter-spacing="-0.5">31,240</text>
+  <text x="40" y="398" font-size="12" fill="#6B7280">원 · Cart 1건당</text>
+
+  <!-- Card 4: 할인 도달률 -->
+  <rect x="200" y="304" width="170" height="120" rx="16" fill="#FFFFFF"/>
+  <text x="220" y="332" font-size="12" font-weight="600" fill="#6B7280">할인 도달률</text>
+  <text x="220" y="376" font-size="26" font-weight="800" fill="#00A968"
+        font-feature-settings="'tnum'" letter-spacing="-0.5">80%</text>
+  <text x="220" y="398" font-size="12" fill="#6B7280">4건 / 5건</text>
+
+  <!-- ===== 마트별 Top 3 ===== -->
+  <text x="20" y="458" font-size="13" font-weight="600" fill="#6B7280">마트별 지출 Top 3</text>
+
+  <rect x="20" y="472" width="350" height="218" rx="16" fill="#FFFFFF"/>
+
+  <!-- Rank 1 -->
+  <rect x="40" y="494" width="24" height="24" rx="12" fill="#1E3A5F"/>
+  <text x="52" y="511" font-size="13" font-weight="800" fill="#FFFFFF" text-anchor="middle">1</text>
+  <text x="76" y="514" font-size="15" font-weight="700" fill="#1A1A1A">코스트코</text>
+  <text x="76" y="532" font-size="11" fill="#6B7280">2회 · 평균 43,800원</text>
+  <text x="350" y="514" font-size="16" font-weight="700" fill="#1A1A1A" text-anchor="end"
+        font-feature-settings="'tnum'">87,600원</text>
+  <rect x="76" y="540" width="200" height="3" rx="1.5" fill="#E5E7EB"/>
+  <rect x="76" y="540" width="200" height="3" rx="1.5" fill="#1E3A5F"/>
+  <line x1="40" y1="558" x2="350" y2="558" stroke="#E5E7EB" stroke-width="1"/>
+
+  <!-- Rank 2 -->
+  <rect x="40" y="572" width="24" height="24" rx="12" fill="#6B7280"/>
+  <text x="52" y="589" font-size="13" font-weight="800" fill="#FFFFFF" text-anchor="middle">2</text>
+  <text x="76" y="592" font-size="15" font-weight="700" fill="#1A1A1A">이마트 트레이더스</text>
+  <text x="76" y="610" font-size="11" fill="#6B7280">2회 · 평균 22,600원</text>
+  <text x="350" y="592" font-size="16" font-weight="700" fill="#1A1A1A" text-anchor="end"
+        font-feature-settings="'tnum'">45,200원</text>
+  <rect x="76" y="618" width="200" height="3" rx="1.5" fill="#E5E7EB"/>
+  <rect x="76" y="618" width="103" height="3" rx="1.5" fill="#1E3A5F"/>
+  <line x1="40" y1="636" x2="350" y2="636" stroke="#E5E7EB" stroke-width="1"/>
+
+  <!-- Rank 3 -->
+  <rect x="40" y="650" width="24" height="24" rx="12" fill="#9CA3AF"/>
+  <text x="52" y="667" font-size="13" font-weight="800" fill="#FFFFFF" text-anchor="middle">3</text>
+  <text x="76" y="670" font-size="15" font-weight="700" fill="#1A1A1A">홈플러스</text>
+  <text x="76" y="688" font-size="11" fill="#6B7280">1회</text>
+  <text x="350" y="670" font-size="16" font-weight="700" fill="#1A1A1A" text-anchor="end"
+        font-feature-settings="'tnum'">23,400원</text>
+
+  <!-- ===== Bottom tab bar ===== -->
+  <rect x="0" y="740" width="390" height="80" fill="#FFFFFF"/>
+  <line x1="0" y1="740" x2="390" y2="740" stroke="#E5E7EB" stroke-width="1"/>
+
+  <!-- Tab: Home -->
+  <g transform="translate(48,760)" fill="none" stroke="#6B7280" stroke-width="1.5">
+    <path d="M 2 12 L 12 2 L 22 12 L 22 22 L 14 22 L 14 16 L 10 16 L 10 22 L 2 22 Z"/>
+  </g>
+  <text x="60" y="800" font-size="11" fill="#6B7280" text-anchor="middle">홈</text>
+
+  <!-- Tab: 기록 -->
+  <g transform="translate(146,760)" fill="none" stroke="#6B7280" stroke-width="1.5">
+    <circle cx="11" cy="11" r="9"/>
+    <path d="M 11 5 L 11 11 L 15 14" stroke-linecap="round"/>
+  </g>
+  <text x="157" y="800" font-size="11" fill="#6B7280" text-anchor="middle">기록</text>
+
+  <!-- Tab: 통계 (active) -->
+  <g transform="translate(244,760)" fill="#1E3A5F">
+    <rect x="0" y="14" width="4" height="8"/>
+    <rect x="7" y="8" width="4" height="14"/>
+    <rect x="14" y="2" width="4" height="20"/>
+  </g>
+  <text x="255" y="800" font-size="11" font-weight="700" fill="#1E3A5F" text-anchor="middle">통계</text>
+
+  <!-- Tab: 설정 -->
+  <g transform="translate(342,760)" fill="none" stroke="#6B7280" stroke-width="1.5">
+    <circle cx="11" cy="11" r="4"/>
+    <circle cx="11" cy="11" r="9"/>
+  </g>
+  <text x="353" y="800" font-size="11" fill="#6B7280" text-anchor="middle">설정</text>
+</svg>

@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="MartCart.AppFaithful.Pages.OnboardingPage"
+             Shell.NavBarIsVisible="False"
+             BackgroundColor="{StaticResource BgColor}">
+
+    <Grid RowDefinitions="*,Auto,Auto" Padding="0,40,0,32">
+
+        <CarouselView Grid.Row="0" x:Name="Carousel" IndicatorView="Dots" Loop="False">
+            <CarouselView.ItemTemplate>
+                <DataTemplate>
+                    <Grid Padding="32,20">
+                        <VerticalStackLayout HorizontalOptions="Center" VerticalOptions="Center" Spacing="20">
+
+                            <Border Background="{StaticResource ThumbDefaultColor}" Stroke="Transparent"
+                                    StrokeShape="RoundRectangle 60" WidthRequest="120" HeightRequest="120"
+                                    HorizontalOptions="Center">
+                                <Label Text="{Binding Emoji}" FontSize="52" HorizontalOptions="Center" VerticalOptions="Center"/>
+                            </Border>
+
+                            <Label Text="{Binding Title}" FontSize="22" FontAttributes="Bold"
+                                   TextColor="{StaticResource TextColor}" HorizontalTextAlignment="Center"/>
+
+                            <Label Text="{Binding Subtitle}" FontSize="14" LineHeight="1.55"
+                                   TextColor="{StaticResource MutedColor}" HorizontalTextAlignment="Center"/>
+
+                        </VerticalStackLayout>
+                    </Grid>
+                </DataTemplate>
+            </CarouselView.ItemTemplate>
+        </CarouselView>
+
+        <IndicatorView Grid.Row="1" x:Name="Dots"
+                       HorizontalOptions="Center"
+                       IndicatorColor="{StaticResource DividerColor}"
+                       SelectedIndicatorColor="{StaticResource PrimaryColor}"
+                       IndicatorSize="8"
+                       Margin="0,12,0,20"/>
+
+        <Grid Grid.Row="2" Padding="24,0" ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+
+            <Label Grid.Column="0" x:Name="SkipLabel" Text="건너뛰기" FontSize="13" FontAttributes="Bold"
+                   TextColor="{StaticResource MutedColor}" VerticalOptions="Center">
+                <Label.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnSkipTapped"/>
+                </Label.GestureRecognizers>
+            </Label>
+
+            <Border Grid.Column="2" Background="{StaticResource PrimaryBrush}" Stroke="Transparent"
+                    StrokeShape="RoundRectangle 14" Padding="22,12" MinimumWidthRequest="120">
+                <Border.Shadow>
+                    <Shadow Brush="#0F2A50" Offset="0,6" Radius="14" Opacity="0.22"/>
+                </Border.Shadow>
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnNextTapped"/>
+                </Border.GestureRecognizers>
+                <Label x:Name="NextLabel" Text="다음 →" FontSize="14" FontAttributes="Bold" TextColor="White"
+                       HorizontalOptions="Center" VerticalOptions="Center" InputTransparent="True"/>
+            </Border>
+
+        </Grid>
+    </Grid>
+</ContentPage>

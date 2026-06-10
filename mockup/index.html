@@ -1,0 +1,500 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+<title>MartCart · 장바구니 상세</title>
+<link rel="preconnect" href="https://cdn.jsdelivr.net"/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css"/>
+<link rel="stylesheet" href="styles.css"/>
+<style>
+  /* ===== Scroll area ===== */
+  .scroll{position:absolute; top:110px; left:0; right:0; bottom:84px; overflow-y:auto; overflow-x:hidden; -webkit-overflow-scrolling:touch}
+  .scroll::-webkit-scrollbar{width:0}
+
+  /* ===== Hero card ===== */
+  .hero{margin:14px 16px 0; background:var(--grad-hero); border-radius:var(--r-hero); padding:24px; box-shadow:var(--shadow-hero)}
+  .hero .label-row{display:flex; align-items:center; gap:10px}
+  .hero .label-row .label{font-size:12px; font-weight:600; color:var(--muted)}
+  .hero .label-row .chip{background:#EEF2F7; color:var(--primary); font-size:10px; font-weight:700; padding:3px 10px; border-radius:9px}
+  .hero .amount{margin-top:8px; display:flex; align-items:baseline; gap:6px; font-feature-settings:'tnum'}
+  .hero .amount .big{font-size:50px; font-weight:800; letter-spacing:-1.8px; line-height:1}
+  .hero .amount .unit{font-size:22px; font-weight:700; color:var(--muted)}
+  .hero .threshold-row{display:flex; justify-content:space-between; align-items:center; margin-top:18px}
+  .hero .threshold-row .left{font-size:13px; color:var(--muted)}
+  .hero .threshold-row .right{font-size:14px; font-weight:800; color:var(--accent); font-feature-settings:'tnum'}
+  .hero .progress{position:relative; margin-top:10px; height:10px; background:var(--divider); border-radius:5px}
+  .hero .progress > i{display:block; height:100%; background:var(--grad-progress); border-radius:5px}
+  .hero .progress .thumb{position:absolute; top:-3px; width:14px; height:14px; border-radius:50%; background:#fff; border:2px solid var(--accent); box-shadow:0 1px 3px rgba(0,0,0,.15)}
+  .hero .pct{margin-top:6px; text-align:right; font-size:11px; font-weight:700; color:var(--accent); font-feature-settings:'tnum'}
+  .hero hr{border:0; border-top:1px solid #EEF2F7; margin:18px 0 14px}
+  .hero .sale-row{display:flex; justify-content:space-between; align-items:center}
+  .hero .sale-row .left small{display:block; font-size:12px; color:var(--muted); margin-bottom:4px}
+  .hero .sale-row .left b{font-size:20px; font-weight:700; font-feature-settings:'tnum'}
+  .hero .sale-row .badge{background:var(--accent-bg); color:var(--accent); font-size:12px; font-weight:700; padding:5px 12px; border-radius:var(--r-chip); font-feature-settings:'tnum'}
+
+  /* ===== Banner ===== */
+  .banner{position:relative; margin:16px 20px 0; background:var(--grad-banner); border-radius:14px; padding:14px 16px 14px 22px; box-shadow:var(--shadow-card); cursor:pointer}
+  .banner::before{content:""; position:absolute; left:0; top:0; bottom:0; width:6px; background:var(--warn); border-radius:3px 0 0 3px}
+  .banner .row{display:flex; align-items:center; gap:14px}
+  .banner .ad-chip{background:#fff; color:var(--warn-text); font-size:10px; font-weight:700; padding:3px 9px; border-radius:9px}
+  .banner .icon{width:42px; height:42px; background:#fff; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:22px}
+  .banner .text{flex:1}
+  .banner .text .t1{font-size:13px; font-weight:700}
+  .banner .text .t2{font-size:12px; color:var(--muted); margin-top:2px}
+  .banner .text .t3{font-size:11px; font-weight:700; color:var(--warn-text); margin-top:6px}
+  .banner .close{width:22px; height:22px; border-radius:50%; background:rgba(255,255,255,.7); display:flex; align-items:center; justify-content:center; color:var(--warn-text); font-size:14px}
+
+  /* ===== Items section ===== */
+  .items-header{display:flex; align-items:center; gap:8px; padding:24px 24px 12px}
+  .items-header h3{margin:0; font-size:15px; font-weight:700}
+  .items-header .count{background:var(--text); color:#fff; font-size:11px; font-weight:700; padding:2px 9px; border-radius:9px}
+  .items-header .sort{margin-left:auto; font-size:12px; font-weight:600; color:var(--muted)}
+
+  .items-card{margin:0 16px; background:#fff; border-radius:var(--r-card); box-shadow:var(--shadow-card); overflow:hidden}
+  .item{display:flex; align-items:center; gap:14px; padding:14px 18px; cursor:pointer; transition:background .15s}
+  .item:not(:last-child){border-bottom:1px solid var(--divider-soft)}
+  .item:active{background:#F8FAFC}
+  .item.new{background:#F0FDF4}
+  .item .thumb{width:40px; height:40px; border-radius:11px; display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0}
+  .item .thumb.t-fruit{background:#FEE2E2}
+  .item .thumb.t-grain{background:var(--warn-bg)}
+  .item .thumb.t-dairy{background:#DBEAFE}
+  .item .thumb.t-sauce{background:var(--warn-bg)}
+  .item .info{flex:1; min-width:0}
+  .item .name-row{display:flex; align-items:center; gap:6px}
+  .item .name{font-size:14px; font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+  .item .new-badge{background:var(--accent); color:#fff; font-size:9px; font-weight:700; padding:2px 7px; border-radius:8px; flex-shrink:0}
+  .item .price-row{font-size:11px; color:var(--muted); margin-top:3px; font-feature-settings:'tnum'; display:flex; gap:8px}
+  .item .price-row s{color:var(--muted-2)}
+  .item .price-row .sale{color:var(--text); font-weight:600}
+  .item .total{font-size:14px; font-weight:800; font-feature-settings:'tnum'; flex-shrink:0}
+
+  .add-row-hint{padding:16px 24px 24px; text-align:center; font-size:12px; color:var(--muted-2)}
+  .add-row-hint::before{content:"↑ "; color:var(--muted-2)}
+
+  /* ===== Bottom action bar ===== */
+  .actions{position:absolute; left:0; right:0; bottom:0; height:84px; background:#fff; border-top:1px solid var(--divider); display:flex; gap:12px; padding:14px 20px; z-index:15}
+  .actions .btn{flex:1}
+  .actions .btn-primary{flex:1.6}
+</style>
+</head>
+<body>
+
+<div class="device">
+
+  <!-- Status bar -->
+  <div class="statusbar">
+    <span>9:41</span>
+    <div class="right">
+      <div class="bars"><span></span><span></span><span></span><span></span></div>
+      <div class="battery"><i></i></div>
+    </div>
+  </div>
+  <div class="island"></div>
+
+  <!-- App bar -->
+  <div class="appbar">
+    <div class="back" onclick="window.location.href='home.html'" style="width:36px; height:36px; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; margin-right:4px; margin-left:-8px">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width:22px; height:22px; color:var(--text)"><path d="M15 18l-6-6 6-6"/></svg>
+    </div>
+    <div class="meta">
+      <small>장보는 중</small>
+      <div class="title">이마트 트레이더스 <span style="color:var(--muted); font-size:12px">▾</span></div>
+    </div>
+    <div class="live"><div class="dot"></div><span>진행중</span></div>
+    <div class="more"><i></i><i></i><i></i></div>
+  </div>
+
+  <!-- Scroll area -->
+  <div class="scroll" id="scroll">
+
+    <div class="hero">
+      <div class="label-row">
+        <span class="label">현재 합산</span>
+        <span class="chip">할인 전 · 임계치 기준</span>
+      </div>
+      <div class="amount">
+        <span class="big" id="originalSubtotal">39,600</span>
+        <span class="unit">원</span>
+      </div>
+      <div class="threshold-row">
+        <span class="left">임계치 50,000원까지</span>
+        <span class="right" id="remaining">10,400원</span>
+      </div>
+      <div class="progress"><i id="progFill"></i><div class="thumb" id="progThumb"></div></div>
+      <div class="pct" id="progPct">79%</div>
+      <hr/>
+      <div class="sale-row">
+        <div class="left">
+          <small>구매 정보 · 실 구매가</small>
+          <b id="saleSubtotal">36,300원</b>
+        </div>
+        <div class="badge" id="savedBadge">−3,300원</div>
+      </div>
+    </div>
+
+    <div class="banner" id="banner">
+      <div class="row">
+        <span class="ad-chip">광고</span>
+        <div class="icon">🏪</div>
+        <div class="text">
+          <div class="t1">트레이더스 · 4만원 더 담으면</div>
+          <div class="t2">치즈·요거트 50% 할인 + 5,000원 쿠폰</div>
+          <div class="t3">자세히 보기 →</div>
+        </div>
+        <div class="close" onclick="event.stopPropagation(); this.closest('.banner').remove();">✕</div>
+      </div>
+    </div>
+
+    <div class="items-header">
+      <h3>담은 항목</h3>
+      <span class="count" id="itemCount">5</span>
+      <span class="sort">최근 추가순 ▾</span>
+    </div>
+
+    <div class="items-card" id="itemsCard">
+      <div class="item new" data-id="i1" data-line="8400">
+        <div class="thumb t-fruit">🍎</div>
+        <div class="info">
+          <div class="name-row"><div class="name">부사 사과 5입 1.5kg</div><span class="new-badge">방금 추가</span></div>
+          <div class="price-row"><s>9,900원</s><span class="sale">8,400원</span><span>×1</span></div>
+        </div>
+        <div class="total">8,400원</div>
+      </div>
+      <div class="item" data-id="i2" data-line="8600">
+        <div class="thumb t-grain">🍜</div>
+        <div class="info">
+          <div class="name-row"><div class="name">농심 신라면 5개입</div></div>
+          <div class="price-row"><span>4,300원</span><span>×2</span></div>
+        </div>
+        <div class="total">8,600원</div>
+      </div>
+      <div class="item" data-id="i3" data-line="7900">
+        <div class="thumb t-sauce">🥫</div>
+        <div class="info">
+          <div class="name-row"><div class="name">청정원 햇살담은 양조간장</div></div>
+          <div class="price-row"><s>8,900원</s><span class="sale">7,900원</span><span>×1</span></div>
+        </div>
+        <div class="total">7,900원</div>
+      </div>
+      <div class="item" data-id="i4" data-line="4400">
+        <div class="thumb t-dairy">🥛</div>
+        <div class="info">
+          <div class="name-row"><div class="name">매일 바이오 요거트 4입</div></div>
+          <div class="price-row"><s>5,200원</s><span class="sale">4,400원</span><span>×1</span></div>
+        </div>
+        <div class="total">4,400원</div>
+      </div>
+      <div class="item" data-id="i5" data-line="7000">
+        <div class="thumb t-dairy">🥛</div>
+        <div class="info">
+          <div class="name-row"><div class="name">서울우유 1L</div></div>
+          <div class="price-row"><span>3,500원</span><span>×2</span></div>
+        </div>
+        <div class="total">7,000원</div>
+      </div>
+      <div class="item" data-id="i6" data-line="3200">
+        <div class="thumb t-grain">🍪</div>
+        <div class="info">
+          <div class="name-row"><div class="name">해태 오예스 12개입</div></div>
+          <div class="price-row"><s>4,500원</s><span class="sale">3,200원</span><span>×1</span></div>
+        </div>
+        <div class="total">3,200원</div>
+      </div>
+      <div class="item" data-id="i7" data-line="2980">
+        <div class="thumb t-fruit">🥬</div>
+        <div class="info">
+          <div class="name-row"><div class="name">유기농 청상추 200g</div></div>
+          <div class="price-row"><span>2,980원</span><span>×1</span></div>
+        </div>
+        <div class="total">2,980원</div>
+      </div>
+    </div>
+
+    <div class="add-row-hint">탭하여 편집 · 좌→우 스와이프로 삭제</div>
+
+  </div>
+
+  <!-- Bottom action bar -->
+  <div class="actions">
+    <button class="btn btn-secondary" onclick="window.location.href='manual.html'">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 1 1 3 3L7 19l-4 1 1-4z"/></svg>
+      직접 입력
+    </button>
+    <button class="btn btn-primary" onclick="window.location.href='camera.html'">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+      상품 촬영
+    </button>
+  </div>
+
+  <!-- Edit Bottom Sheet (F-08) -->
+  <div class="backdrop" id="editBackdrop" onclick="closeEdit()"></div>
+  <div class="sheet" id="editSheet">
+    <div class="handle"></div>
+    <div class="header">
+      <h3>항목 편집</h3>
+      <span class="action" onclick="closeEdit()">완료</span>
+    </div>
+    <div class="body">
+      <div style="display:flex; gap:14px; align-items:center; padding:6px 0 16px">
+        <div id="editThumb" style="width:48px; height:48px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:24px; flex-shrink:0">🍎</div>
+        <div style="flex:1; min-width:0">
+          <div id="editName" style="font-size:15px; font-weight:700; line-height:1.3">상품명</div>
+          <div id="editPriceMeta" style="font-size:11px; color:var(--muted); margin-top:3px; font-feature-settings:'tnum'">단가</div>
+        </div>
+      </div>
+
+      <div style="display:flex; justify-content:space-between; align-items:center; padding:14px 0; border-top:1px solid var(--divider-soft); border-bottom:1px solid var(--divider-soft)">
+        <label style="font-size:14px; font-weight:600">수량</label>
+        <div class="stepper">
+          <button id="editMinus" onclick="editQty(-1)">−</button>
+          <div class="val" id="editQtyVal">1</div>
+          <button onclick="editQty(1)">+</button>
+        </div>
+      </div>
+
+      <div style="display:flex; justify-content:space-between; align-items:center; padding:16px 0">
+        <label style="font-size:14px; font-weight:600">소계</label>
+        <b id="editTotal" style="font-size:20px; font-weight:800; font-feature-settings:'tnum'">0원</b>
+      </div>
+
+      <div style="margin-top:4px">
+        <label style="display:block; font-size:12px; font-weight:600; color:var(--muted); margin-bottom:6px">메모 <span style="color:var(--muted-2); font-weight:500; margin-left:6px">선택</span></label>
+        <input id="editMemo" type="text" placeholder="예: 엄마 부탁" style="width:100%; height:46px; padding:0 14px; background:#F7F8FA; border:1.5px solid transparent; border-radius:12px; font-family:inherit; font-size:14px; outline:none"/>
+      </div>
+    </div>
+    <div class="footer">
+      <button class="btn btn-ghost" style="flex:1; height:52px; color:var(--danger); border-color:#FECACA" onclick="editDelete()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:18px; height:18px"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+        삭제
+      </button>
+      <button class="btn btn-primary" style="flex:2; height:52px" onclick="closeEdit()">저장</button>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"><span id="toastMsg">메시지</span></div>
+
+  <div class="home-indicator"></div>
+</div>
+
+<div class="caption">항목 탭 → 편집 시트 · 좌→우 스와이프 → 삭제 · <a href="camera.html">📷 촬영</a> · <a href="manual.html">✎ 직접 입력</a> · <a href="#" onclick="localStorage.removeItem('martcart.added'); location.reload(); return false">🗑 추가 항목 초기화</a></div>
+
+<script>
+  const fmt = n => n.toLocaleString('ko-KR') + '원';
+  const THRESHOLD = 50000;
+
+  function recalc(){
+    const items = [...document.querySelectorAll('.item')];
+    let sale = 0;
+    items.forEach(el => sale += +el.dataset.line);
+    const saved = items.reduce((acc,el)=>{
+      const s = el.querySelector('.price-row s');
+      if(!s) return acc;
+      const orig = +s.textContent.replace(/[^\d]/g,'');
+      const saleP = +el.querySelector('.sale').textContent.replace(/[^\d]/g,'');
+      const qty = +el.querySelector('.price-row span:last-child').textContent.replace(/[^\d]/g,'');
+      return acc + (orig - saleP) * qty;
+    }, 0);
+    const orig = sale + saved;
+    const remaining = Math.max(0, THRESHOLD - orig);
+    const pct = Math.min(100, Math.round(orig / THRESHOLD * 1000)/10);
+
+    document.getElementById('originalSubtotal').textContent = orig.toLocaleString('ko-KR');
+    document.getElementById('saleSubtotal').textContent = fmt(sale);
+    document.getElementById('remaining').textContent = fmt(remaining);
+    document.getElementById('savedBadge').textContent = '−' + fmt(saved);
+    document.getElementById('progFill').style.width = pct + '%';
+    document.getElementById('progThumb').style.left = `calc(${pct}% - 7px)`;
+    document.getElementById('progPct').textContent = pct + '%';
+    document.getElementById('itemCount').textContent = items.length;
+  }
+
+  let toastTimer;
+  function toast(msg, undoFn){
+    const t = document.getElementById('toast');
+    document.getElementById('toastMsg').textContent = msg;
+    const oldUndo = t.querySelector('.undo');
+    if (oldUndo) oldUndo.remove();
+    if (undoFn){
+      const u = document.createElement('span');
+      u.className = 'undo';
+      u.textContent = '실행 취소';
+      u.onclick = () => { undoFn(); t.classList.remove('show'); };
+      t.appendChild(u);
+    }
+    t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(()=> t.classList.remove('show'), 4000);
+  }
+
+  // ===== Edit sheet =====
+  let editing = null;
+
+  function openEdit(item){
+    editing = item;
+    const name = item.querySelector('.name').textContent;
+    const qty = +item.querySelector('.price-row span:last-child').textContent.replace(/[^\d]/g,'');
+    const saleEl = item.querySelector('.sale');
+    const unit = saleEl
+      ? +saleEl.textContent.replace(/[^\d]/g,'')
+      : +item.querySelector('.price-row span:first-child').textContent.replace(/[^\d]/g,'');
+    const origEl = item.querySelector('.price-row s');
+    const orig = origEl ? +origEl.textContent.replace(/[^\d]/g,'') : unit;
+    const thumb = item.querySelector('.thumb');
+
+    document.getElementById('editName').textContent = name;
+    const thumbEl = document.getElementById('editThumb');
+    thumbEl.textContent = thumb.textContent;
+    thumbEl.style.background = getComputedStyle(thumb).backgroundColor;
+
+    let meta = `단가 ${unit.toLocaleString('ko-KR')}원`;
+    if (orig !== unit) meta += ` · 정상가 ${orig.toLocaleString('ko-KR')}원`;
+    document.getElementById('editPriceMeta').textContent = meta;
+
+    document.getElementById('editQtyVal').textContent = qty;
+    document.getElementById('editQtyVal').dataset.qty = qty;
+    document.getElementById('editQtyVal').dataset.unit = unit;
+    document.getElementById('editQtyVal').dataset.orig = orig;
+    document.getElementById('editMinus').disabled = qty <= 1;
+    document.getElementById('editTotal').textContent = (unit * qty).toLocaleString('ko-KR') + '원';
+    document.getElementById('editMemo').value = '';
+
+    document.getElementById('editBackdrop').classList.add('show');
+    document.getElementById('editSheet').classList.add('show');
+  }
+
+  function closeEdit(){
+    if (!editing) return;
+    // Commit changes to item
+    const qty = +document.getElementById('editQtyVal').dataset.qty;
+    const unit = +document.getElementById('editQtyVal').dataset.unit;
+    const orig = +document.getElementById('editQtyVal').dataset.orig;
+    const qtySpan = editing.querySelector('.price-row span:last-child');
+    qtySpan.textContent = '×' + qty;
+    editing.dataset.line = unit * qty;
+    editing.querySelector('.total').textContent = (unit * qty).toLocaleString('ko-KR') + '원';
+
+    document.getElementById('editBackdrop').classList.remove('show');
+    document.getElementById('editSheet').classList.remove('show');
+    editing = null;
+    recalc();
+  }
+
+  function editQty(delta){
+    const cur = +document.getElementById('editQtyVal').dataset.qty;
+    const next = Math.max(1, cur + delta);
+    document.getElementById('editQtyVal').textContent = next;
+    document.getElementById('editQtyVal').dataset.qty = next;
+    document.getElementById('editMinus').disabled = next <= 1;
+    const unit = +document.getElementById('editQtyVal').dataset.unit;
+    document.getElementById('editTotal').textContent = (unit * next).toLocaleString('ko-KR') + '원';
+  }
+
+  function editDelete(){
+    if (!editing) return;
+    const el = editing;
+    const snapshot = el.outerHTML;
+    const parent = el.parentNode;
+    const next = el.nextSibling;
+    document.getElementById('editBackdrop').classList.remove('show');
+    document.getElementById('editSheet').classList.remove('show');
+    editing = null;
+    el.remove();
+    recalc();
+    toast('항목 삭제됨', () => {
+      parent.insertBefore(document.createRange().createContextualFragment(snapshot), next);
+      rebindSwipe();
+      recalc();
+    });
+  }
+
+  document.getElementById('itemsCard').addEventListener('click', e => {
+    const item = e.target.closest('.item');
+    if (!item) return;
+    openEdit(item);
+  });
+
+  let drag = null;
+  function onStart(e, el){
+    const x = e.touches ? e.touches[0].clientX : e.clientX;
+    drag = { el, startX:x, dx:0 };
+    el.style.transition = 'none';
+  }
+  function onMove(e){
+    if (!drag) return;
+    const x = e.touches ? e.touches[0].clientX : e.clientX;
+    drag.dx = Math.max(0, x - drag.startX);
+    drag.el.style.transform = `translateX(${drag.dx}px)`;
+    drag.el.style.background = drag.dx > 100 ? '#FEE2E2' : '';
+  }
+  function onEnd(){
+    if (!drag) return;
+    const el = drag.el;
+    el.style.transition = 'transform .2s, background .2s, opacity .2s';
+    if (drag.dx > el.offsetWidth * 0.4){
+      el.style.transform = `translateX(${el.offsetWidth}px)`;
+      el.style.opacity = '0';
+      const snapshot = el.outerHTML;
+      const parent = el.parentNode;
+      const next = el.nextSibling;
+      setTimeout(()=>{
+        el.remove();
+        recalc();
+        toast('항목 삭제됨', () => {
+          parent.insertBefore(document.createRange().createContextualFragment(snapshot), next);
+          rebindSwipe();
+          recalc();
+        });
+      }, 200);
+    } else {
+      el.style.transform = '';
+      el.style.background = '';
+    }
+    drag = null;
+  }
+  function rebindSwipe(){
+    document.querySelectorAll('.item').forEach(el => {
+      el.ontouchstart = e => onStart(e, el);
+      el.ontouchmove = onMove;
+      el.ontouchend = onEnd;
+      el.onmousedown = e => onStart(e, el);
+    });
+    document.onmousemove = onMove;
+    document.onmouseup = onEnd;
+  }
+  // Inject items added via camera/manual entry (localStorage)
+  (function injectAdded(){
+    const added = JSON.parse(localStorage.getItem('martcart.added') || '[]');
+    if (!added.length) return;
+    const card = document.getElementById('itemsCard');
+    // Newest first
+    added.slice().reverse().forEach((it, idx) => {
+      const isNewest = idx === 0;
+      const lineTotal = it.sale * it.quantity;
+      const el = document.createElement('div');
+      el.className = 'item' + (isNewest ? ' new' : '');
+      el.dataset.id = it.id;
+      el.dataset.line = lineTotal;
+      const priceRow = it.original && it.original !== it.sale
+        ? `<s>${it.original.toLocaleString('ko-KR')}원</s><span class="sale">${it.sale.toLocaleString('ko-KR')}원</span><span>×${it.quantity}</span>`
+        : `<span>${it.sale.toLocaleString('ko-KR')}원</span><span>×${it.quantity}</span>`;
+      el.innerHTML = `
+        <div class="thumb t-grain" style="font-size:18px">${it.thumb || '🆕'}</div>
+        <div class="info">
+          <div class="name-row"><div class="name">${escapeHtml(it.name)}</div>${isNewest ? '<span class="new-badge">방금 추가</span>' : ''}</div>
+          <div class="price-row">${priceRow}</div>
+        </div>
+        <div class="total">${lineTotal.toLocaleString('ko-KR')}원</div>`;
+      card.insertBefore(el, card.firstChild);
+    });
+  })();
+
+  function escapeHtml(s){ return (s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+  rebindSwipe();
+  recalc();
+</script>
+</body>
+</html>

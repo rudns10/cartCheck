@@ -1,0 +1,406 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+<title>MartCart · 통계</title>
+<link rel="preconnect" href="https://cdn.jsdelivr.net"/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css"/>
+<link rel="stylesheet" href="styles.css"/>
+<style>
+  /* ===== Top bar ===== */
+  .topbar{
+    position:absolute; top:50px; left:0; right:0; height:64px;
+    padding:14px 20px; display:flex; align-items:center; z-index:15;
+  }
+  .topbar h1{margin:0; font-size:22px; font-weight:800; letter-spacing:-.4px}
+  .topbar .right{margin-left:auto; display:flex; gap:8px}
+  .topbar .icon{
+    width:38px; height:38px; border-radius:50%; background:#fff;
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer; box-shadow:var(--shadow-card);
+  }
+  .topbar .icon svg{width:18px; height:18px; color:var(--text)}
+
+  .scroll{position:absolute; top:114px; left:0; right:0; bottom:80px; overflow-y:auto; -webkit-overflow-scrolling:touch; padding:6px 0 24px}
+  .scroll::-webkit-scrollbar{width:0}
+
+  /* ===== Period chips ===== */
+  .period-row{display:flex; gap:8px; padding:6px 16px 16px}
+  .period-chip{
+    padding:9px 16px; border-radius:99px;
+    font-size:13px; font-weight:700; cursor:pointer;
+    background:#fff; color:var(--muted); border:1px solid var(--divider);
+    transition:all .15s;
+  }
+  .period-chip.active{background:var(--primary); color:#fff; border-color:var(--primary)}
+  .period-chip svg{width:13px; height:13px; vertical-align:-2px; margin-right:3px}
+
+  /* ===== Saved hero ===== */
+  .saved-hero{
+    margin:0 16px 14px;
+    background:linear-gradient(135deg, #00A968 0%, #00D080 60%, #4ADE80 100%);
+    color:#fff; border-radius:22px; padding:22px 24px;
+    box-shadow:0 10px 24px rgba(0,168,104,.28); position:relative; overflow:hidden;
+  }
+  .saved-hero::before{
+    content:""; position:absolute; right:-30px; bottom:-30px;
+    width:140px; height:140px; border-radius:50%; background:rgba(255,255,255,.12);
+  }
+  .saved-hero::after{
+    content:""; position:absolute; right:20px; top:-40px;
+    width:80px; height:80px; border-radius:50%; background:rgba(255,255,255,.08);
+  }
+  .saved-hero .lbl{font-size:12px; font-weight:700; opacity:.85; letter-spacing:.3px}
+  .saved-hero .amount{font-size:38px; font-weight:800; letter-spacing:-1.2px; margin-top:4px; font-feature-settings:'tnum'; position:relative}
+  .saved-hero .amount .won{font-size:18px; font-weight:700; opacity:.85; margin-left:3px}
+  .saved-hero .sub{font-size:12px; opacity:.85; margin-top:6px; position:relative}
+  .saved-hero .pill{
+    display:inline-block; margin-top:14px;
+    background:rgba(255,255,255,.2); padding:5px 11px; border-radius:99px;
+    font-size:11px; font-weight:700; position:relative; backdrop-filter:blur(4px);
+  }
+
+  /* ===== Metric grid (2×2) ===== */
+  .metric-grid{display:grid; grid-template-columns:1fr 1fr; gap:10px; padding:0 16px}
+  .metric{
+    background:#fff; border-radius:18px; padding:16px;
+    box-shadow:var(--shadow-card); min-height:118px;
+    display:flex; flex-direction:column; justify-content:space-between;
+  }
+  .metric .head{display:flex; align-items:center; gap:6px}
+  .metric .head .ic{
+    width:24px; height:24px; border-radius:7px;
+    background:#EEF2F7; color:var(--primary);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .metric .head .ic svg{width:14px; height:14px}
+  .metric .head .lbl{font-size:12px; font-weight:700; color:var(--muted)}
+  .metric .val{font-size:24px; font-weight:800; letter-spacing:-.5px; font-feature-settings:'tnum'; margin-top:8px; line-height:1.05}
+  .metric .val .unit{font-size:13px; font-weight:700; color:var(--muted); margin-left:2px}
+  .metric .val.accent{color:var(--accent)}
+  .metric .foot{font-size:11px; color:var(--muted); margin-top:6px}
+  .metric .foot .trend{display:inline-flex; align-items:center; gap:2px; font-weight:700; color:var(--accent); margin-right:4px}
+  .metric .foot .trend.down{color:var(--danger)}
+  .metric .foot .trend svg{width:10px; height:10px}
+
+  /* ===== Daily trend bar chart ===== */
+  .section-head{display:flex; align-items:center; padding:22px 24px 10px}
+  .section-head h3{margin:0; font-size:14px; font-weight:700}
+  .section-head .right{margin-left:auto; font-size:11px; color:var(--muted)}
+
+  .trend-card{margin:0 16px; background:#fff; border-radius:18px; padding:18px 18px 12px; box-shadow:var(--shadow-card)}
+  .trend-row{display:flex; align-items:end; gap:6px; height:96px}
+  .trend-row .bar{
+    flex:1; background:linear-gradient(180deg, var(--accent-2), var(--accent));
+    border-radius:4px 4px 2px 2px; min-height:4px; position:relative;
+    transition:transform .15s;
+  }
+  .trend-row .bar.dim{background:#E5E7EB}
+  .trend-row .bar.today{background:linear-gradient(180deg, var(--primary-2), var(--primary)); box-shadow:0 0 0 3px rgba(30,58,95,.12)}
+  .trend-row .bar:hover{transform:scaleY(1.04); transform-origin:bottom}
+  .trend-labels{display:flex; gap:6px; margin-top:8px; font-size:10px; color:var(--muted-2); font-weight:600; font-feature-settings:'tnum'}
+  .trend-labels span{flex:1; text-align:center}
+  .trend-foot{display:flex; justify-content:space-between; margin-top:10px; padding-top:10px; border-top:1px solid var(--divider-soft); font-size:11px}
+  .trend-foot .left{color:var(--muted)}
+  .trend-foot .left b{color:var(--text); font-weight:700; font-feature-settings:'tnum'}
+  .trend-foot .right b{color:var(--accent); font-weight:700; font-feature-settings:'tnum'}
+
+  /* ===== Top 3 marts ===== */
+  .top3-card{margin:0 16px; background:#fff; border-radius:18px; padding:20px 18px; box-shadow:var(--shadow-card)}
+  .rank{display:flex; align-items:center; gap:12px; padding:10px 0}
+  .rank:not(:last-child){border-bottom:1px solid var(--divider-soft)}
+  .rank .badge{
+    width:32px; height:32px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    font-size:13px; font-weight:800; color:#fff;
+    flex-shrink:0;
+  }
+  .rank .badge.r1{background:linear-gradient(135deg, var(--primary-2), var(--primary))}
+  .rank .badge.r2{background:linear-gradient(135deg, #94A3B8, var(--muted))}
+  .rank .badge.r3{background:linear-gradient(135deg, #CBD5E1, var(--muted-2))}
+  .rank .info{flex:1; min-width:0}
+  .rank .name{font-size:14px; font-weight:700}
+  .rank .sub{font-size:11px; color:var(--muted); margin-top:2px}
+  .rank .price{font-size:15px; font-weight:800; font-feature-settings:'tnum'; flex-shrink:0}
+  .rank .bar{
+    grid-column:1/-1; height:4px; background:var(--divider); border-radius:2px;
+    margin-top:8px; overflow:hidden;
+  }
+  .rank .bar > i{display:block; height:100%; background:var(--primary); border-radius:2px}
+  .rank .bar > i.r2{background:linear-gradient(90deg, #94A3B8, var(--muted))}
+  .rank .bar > i.r3{background:linear-gradient(90deg, #CBD5E1, var(--muted-2))}
+  .rank-grid{display:grid; grid-template-columns:auto 1fr auto; column-gap:12px; row-gap:0; align-items:center}
+
+  /* ===== Insight banner ===== */
+  .insight{
+    margin:18px 16px 0; padding:16px 18px;
+    background:linear-gradient(135deg, #EEF2F7, #F1F5F9);
+    border-radius:14px; display:flex; gap:12px; align-items:flex-start;
+  }
+  .insight .ic{
+    width:36px; height:36px; border-radius:10px;
+    background:#fff; flex-shrink:0;
+    display:flex; align-items:center; justify-content:center; font-size:18px;
+  }
+  .insight .text{flex:1}
+  .insight .t1{font-size:12px; font-weight:700; color:var(--primary); margin-bottom:3px; letter-spacing:.3px}
+  .insight .t2{font-size:13px; font-weight:600; color:var(--text); line-height:1.4}
+</style>
+</head>
+<body>
+
+<div class="device">
+
+  <div class="statusbar">
+    <span>9:41</span>
+    <div class="right">
+      <div class="bars"><span></span><span></span><span></span><span></span></div>
+      <div class="battery"><i></i></div>
+    </div>
+  </div>
+  <div class="island"></div>
+
+  <div class="topbar">
+    <h1>통계</h1>
+    <div class="right">
+      <div class="icon" title="내보내기">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+      </div>
+    </div>
+  </div>
+
+  <div class="scroll">
+
+    <!-- Period chips -->
+    <div class="period-row" id="periods">
+      <div class="period-chip active" data-p="thismonth">이번 달</div>
+      <div class="period-chip" data-p="lastmonth">지난 달</div>
+      <div class="period-chip" data-p="3months">최근 3개월</div>
+      <div class="period-chip" data-p="custom">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        직접
+      </div>
+    </div>
+
+    <!-- Saved hero -->
+    <div class="saved-hero">
+      <div class="lbl">이번 달 총 절약액</div>
+      <div class="amount">12,400<span class="won">원</span></div>
+      <div class="sub">정상가 대비 7.4% 할인받으셨어요</div>
+      <span class="pill">↗ 지난 달보다 2,800원 더 절약</span>
+    </div>
+
+    <!-- Metric grid -->
+    <div class="metric-grid">
+      <div class="metric">
+        <div class="head">
+          <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" stroke-linecap="round"/></svg></div>
+          <span class="lbl">실 구매</span>
+        </div>
+        <div>
+          <div class="val">156,200<span class="unit">원</span></div>
+          <div class="foot">
+            <span class="trend down">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 16 6 10h12z"/></svg>
+              8%
+            </span>
+            전월 대비
+          </div>
+        </div>
+      </div>
+
+      <div class="metric">
+        <div class="head">
+          <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="20" r="1.5"/><circle cx="18" cy="20" r="1.5"/><path d="M1 1h4l2.7 13.4a2 2 0 0 0 2 1.6h9.7a2 2 0 0 0 2-1.6L23 6H6"/></svg></div>
+          <span class="lbl">장보기</span>
+        </div>
+        <div>
+          <div class="val">5<span class="unit">회</span></div>
+          <div class="foot">평균 <b style="color:var(--text); font-weight:700">6.2일</b> 간격</div>
+        </div>
+      </div>
+
+      <div class="metric">
+        <div class="head">
+          <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 3v18h18"/><path d="m7 14 4-4 4 4 5-5"/></svg></div>
+          <span class="lbl">평균 객단가</span>
+        </div>
+        <div>
+          <div class="val">31,240<span class="unit">원</span></div>
+          <div class="foot">Cart 1건당</div>
+        </div>
+      </div>
+
+      <div class="metric">
+        <div class="head">
+          <div class="ic" style="background:#D1FAE5; color:var(--accent-dark)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg></div>
+          <span class="lbl">할인 도달률</span>
+        </div>
+        <div>
+          <div class="val accent">80<span class="unit">%</span></div>
+          <div class="foot">4건 / 5건</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Daily trend -->
+    <div class="section-head">
+      <h3>주간 지출 추이</h3>
+      <span class="right">최근 7일 · 합계 47,840원</span>
+    </div>
+    <div class="trend-card">
+      <div class="trend-row" id="trendBars">
+        <div class="bar dim" style="height:8%" data-v="0"></div>
+        <div class="bar" style="height:48%" data-v="14200"></div>
+        <div class="bar dim" style="height:8%" data-v="0"></div>
+        <div class="bar" style="height:32%" data-v="9400"></div>
+        <div class="bar dim" style="height:8%" data-v="0"></div>
+        <div class="bar" style="height:78%" data-v="23000"></div>
+        <div class="bar today" style="height:24%" data-v="1240"></div>
+      </div>
+      <div class="trend-labels">
+        <span>화</span><span>수</span><span>목</span><span>금</span><span>토</span><span>일</span><span>월</span>
+      </div>
+      <div class="trend-foot">
+        <span class="left">최고: <b>일요일 23,000원</b></span>
+        <span class="right">평균 <b>6,834원/일</b></span>
+      </div>
+    </div>
+
+    <!-- Top 3 marts -->
+    <div class="section-head">
+      <h3>마트별 지출 Top 3</h3>
+      <span class="right">전체 6개 마트</span>
+    </div>
+    <div class="top3-card">
+      <div class="rank">
+        <div class="rank-grid">
+          <div class="badge r1">1</div>
+          <div class="info">
+            <div class="name">코스트코</div>
+            <div class="sub">2회 · 평균 43,800원 · 임계치 100% 도달</div>
+          </div>
+          <div class="price">87,600원</div>
+          <div class="bar" style="grid-column:2 / -1; margin-left:0"><i style="width:100%"></i></div>
+        </div>
+      </div>
+
+      <div class="rank">
+        <div class="rank-grid">
+          <div class="badge r2">2</div>
+          <div class="info">
+            <div class="name">이마트 트레이더스</div>
+            <div class="sub">2회 · 평균 22,600원 · 임계치 100% 도달</div>
+          </div>
+          <div class="price">45,200원</div>
+          <div class="bar" style="grid-column:2 / -1; margin-left:0"><i class="r2" style="width:51.6%"></i></div>
+        </div>
+      </div>
+
+      <div class="rank">
+        <div class="rank-grid">
+          <div class="badge r3">3</div>
+          <div class="info">
+            <div class="name">홈플러스</div>
+            <div class="sub">1회 · 평균 23,400원</div>
+          </div>
+          <div class="price">23,400원</div>
+          <div class="bar" style="grid-column:2 / -1; margin-left:0"><i class="r3" style="width:26.7%"></i></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Insight -->
+    <div class="insight">
+      <div class="ic">💡</div>
+      <div class="text">
+        <div class="t1">이번 달 인사이트</div>
+        <div class="t2">평균보다 4,200원 더 절약했어요. 임계치 도달률 80%는 상위 15%에 해당합니다.</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Tab bar -->
+  <div class="tabbar">
+    <a class="tab" href="home.html">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3 2 12h3v8h5v-6h4v6h5v-8h3z"/></svg>
+      <span class="lbl">홈</span>
+    </a>
+    <a class="tab" href="history.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3" stroke-linecap="round"/></svg>
+      <span class="lbl">기록</span>
+    </a>
+    <a class="tab active" href="stats.html">
+      <svg viewBox="0 0 24 24" fill="currentColor"><rect x="4" y="12" width="4" height="9" rx="1"/><rect x="10" y="6" width="4" height="15" rx="1"/><rect x="16" y="9" width="4" height="12" rx="1"/></svg>
+      <span class="lbl">통계</span>
+    </a>
+    <a class="tab" href="settings.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h0a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h0a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v0a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      <span class="lbl">설정</span>
+    </a>
+  </div>
+
+  <div class="toast" id="toast"><span id="toastMsg">메시지</span></div>
+
+  <div class="home-indicator"></div>
+</div>
+
+<div class="caption">기간 칩으로 범위 변경 · 막대 탭 시 금액 · <a href="home.html">홈</a></div>
+
+<script>
+  // Period chips: switching with mock data
+  const datasets = {
+    thismonth:{ saved:'12,400', sub:'정상가 대비 7.4% 할인받으셨어요', pill:'↗ 지난 달보다 2,800원 더 절약',
+                spent:'156,200', spentTrend:'8%', spentDown:true,
+                count:'5', gap:'6.2일', avg:'31,240', reach:'80', reachSub:'4건 / 5건' },
+    lastmonth:{ saved:'9,600', sub:'정상가 대비 6.3% 할인받으셨어요', pill:'전월 평균 수준',
+                spent:'142,800', spentTrend:'4%', spentDown:false,
+                count:'4', gap:'7.5일', avg:'35,700', reach:'75', reachSub:'3건 / 4건' },
+    '3months':{ saved:'31,500', sub:'정상가 대비 7.0% 할인', pill:'↗ 안정적인 절약 패턴',
+                spent:'418,200', spentTrend:'',
+                count:'13', gap:'6.9일', avg:'32,170', reach:'77', reachSub:'10건 / 13건' },
+    custom:{    saved:'—', sub:'기간을 직접 선택해주세요', pill:'',
+                spent:'—', spentTrend:'',
+                count:'—', gap:'—', avg:'—', reach:'—', reachSub:'' }
+  };
+
+  document.getElementById('periods').addEventListener('click', e => {
+    const chip = e.target.closest('.period-chip');
+    if (!chip) return;
+    document.querySelectorAll('.period-chip').forEach(c => c.classList.remove('active'));
+    chip.classList.add('active');
+    const d = datasets[chip.dataset.p];
+    if (!d) return;
+    const $ = sel => document.querySelector(sel);
+    $('.saved-hero .amount').innerHTML = `${d.saved}<span class="won">원</span>`;
+    $('.saved-hero .sub').textContent = d.sub;
+    $('.saved-hero .pill').textContent = d.pill || '';
+    $('.saved-hero .pill').style.display = d.pill ? 'inline-block' : 'none';
+    const metrics = document.querySelectorAll('.metric .val');
+    metrics[0].innerHTML = `${d.spent}<span class="unit">원</span>`;
+    metrics[1].innerHTML = `${d.count}<span class="unit">회</span>`;
+    metrics[2].innerHTML = `${d.avg}<span class="unit">원</span>`;
+    metrics[3].innerHTML = `${d.reach}<span class="unit">%</span>`;
+  });
+
+  // Bar tap -> show value
+  document.getElementById('trendBars').addEventListener('click', e => {
+    const bar = e.target.closest('.bar');
+    if (!bar) return;
+    const v = +bar.dataset.v;
+    toast(v ? `${v.toLocaleString('ko-KR')}원 지출` : '지출 없음');
+  });
+
+  let toastTimer;
+  function toast(msg){
+    const t = document.getElementById('toast');
+    document.getElementById('toastMsg').textContent = msg;
+    t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(()=> t.classList.remove('show'), 1800);
+  }
+</script>
+</body>
+</html>

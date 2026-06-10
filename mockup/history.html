@@ -1,0 +1,475 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+<title>MartCart · 기록</title>
+<link rel="preconnect" href="https://cdn.jsdelivr.net"/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css"/>
+<link rel="stylesheet" href="styles.css"/>
+<style>
+  /* ===== Top bar (title + filter) ===== */
+  .topbar{
+    position:absolute; top:50px; left:0; right:0; height:64px;
+    padding:14px 20px; display:flex; align-items:center; z-index:15;
+  }
+  .topbar h1{margin:0; font-size:22px; font-weight:800; letter-spacing:-.4px}
+  .topbar .right{margin-left:auto; display:flex; gap:8px}
+  .topbar .icon{
+    width:38px; height:38px; border-radius:50%; background:#fff;
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer; box-shadow:var(--shadow-card);
+  }
+  .topbar .icon svg{width:18px; height:18px; color:var(--text)}
+
+  /* ===== Scroll area ===== */
+  .scroll{position:absolute; top:114px; left:0; right:0; bottom:80px; overflow-y:auto; -webkit-overflow-scrolling:touch; padding:6px 0 24px}
+  .scroll::-webkit-scrollbar{width:0}
+
+  /* ===== Period summary card ===== */
+  .summary{
+    margin:8px 16px 0; padding:20px 22px;
+    background:linear-gradient(135deg, #fff, #FAFBFC);
+    border-radius:20px; box-shadow:var(--shadow-hero);
+  }
+  .summary .label{font-size:12px; font-weight:600; color:var(--muted)}
+  .summary .row{display:flex; align-items:flex-end; gap:10px; margin-top:6px}
+  .summary .total{font-size:34px; font-weight:800; letter-spacing:-1.2px; font-feature-settings:'tnum'; line-height:1}
+  .summary .total .won{font-size:18px; font-weight:700; color:var(--muted); margin-left:2px}
+  .summary .trend{
+    margin-left:auto; align-self:center;
+    display:inline-flex; align-items:center; gap:3px;
+    font-size:11px; font-weight:700; color:var(--accent);
+    background:var(--accent-bg); padding:4px 9px; border-radius:99px;
+  }
+  .summary .trend svg{width:11px; height:11px}
+  .summary .stats{display:flex; gap:18px; margin-top:14px; padding-top:14px; border-top:1px solid var(--divider-soft)}
+  .summary .stats .col{flex:1}
+  .summary .stats .col .v{font-size:15px; font-weight:800; font-feature-settings:'tnum'}
+  .summary .stats .col .v.accent{color:var(--accent)}
+  .summary .stats .col .u{font-size:11px; color:var(--muted); margin-top:2px}
+
+  /* ===== Filter chips ===== */
+  .filters{display:flex; gap:8px; padding:18px 16px 6px; overflow-x:auto; -webkit-overflow-scrolling:touch}
+  .filters::-webkit-scrollbar{height:0}
+  .filter-chip{
+    flex-shrink:0;
+    background:#fff; color:var(--muted);
+    padding:8px 14px; border-radius:99px;
+    font-size:12px; font-weight:700; cursor:pointer;
+    border:1px solid var(--divider);
+    transition:all .15s;
+    white-space:nowrap;
+  }
+  .filter-chip.active{
+    background:var(--primary); color:#fff; border-color:var(--primary);
+  }
+  .filter-chip .cnt{
+    margin-left:5px; font-size:10px; opacity:.7;
+    font-feature-settings:'tnum';
+  }
+  .filter-chip.active .cnt{opacity:.85}
+
+  /* ===== Date group ===== */
+  .date-group{padding:18px 24px 8px; display:flex; align-items:center}
+  .date-group .month{font-size:13px; font-weight:800; color:var(--text)}
+  .date-group .sub{font-size:11px; font-weight:600; color:var(--muted); margin-left:8px}
+
+  /* ===== Cart history item ===== */
+  .hist-list{margin:0 16px; display:flex; flex-direction:column; gap:10px}
+  .hist{
+    background:#fff; border-radius:16px;
+    padding:16px 18px; box-shadow:var(--shadow-card);
+    cursor:pointer; transition:transform .08s;
+    position:relative; overflow:hidden;
+  }
+  .hist:active{transform:scale(.99)}
+  .hist.reached::before{
+    content:""; position:absolute; left:0; top:0; bottom:0; width:4px;
+    background:var(--accent);
+  }
+  .hist .row1{display:flex; align-items:center; gap:12px}
+  .hist .ic{
+    width:42px; height:42px; border-radius:12px;
+    background:linear-gradient(135deg, #EEF2F7, #DBE2EC);
+    display:flex; align-items:center; justify-content:center; font-size:20px;
+    flex-shrink:0;
+  }
+  .hist .info{flex:1; min-width:0}
+  .hist .mart{
+    font-size:15px; font-weight:700;
+    display:flex; align-items:center; gap:6px;
+  }
+  .hist .mart .check{
+    display:inline-flex; align-items:center; gap:3px;
+    background:var(--accent-bg); color:var(--accent);
+    padding:2px 7px 2px 5px; border-radius:99px;
+    font-size:10px; font-weight:700;
+  }
+  .hist .mart .check svg{width:10px; height:10px}
+  .hist .meta{font-size:11px; color:var(--muted); margin-top:3px}
+  .hist .price{text-align:right; flex-shrink:0}
+  .hist .price .total{font-size:16px; font-weight:800; font-feature-settings:'tnum'}
+  .hist .price .saved{
+    display:inline-block; margin-top:3px;
+    background:var(--accent-bg); color:var(--accent);
+    font-size:10px; font-weight:700; padding:2px 7px; border-radius:8px;
+    font-feature-settings:'tnum';
+  }
+  .hist .row2{
+    margin-top:12px; padding-top:12px; border-top:1px solid var(--divider-soft);
+    display:flex; align-items:center; gap:8px; font-size:11px; color:var(--muted);
+  }
+  .hist .row2 .item-strip{
+    flex:1; display:flex; gap:4px; overflow:hidden;
+  }
+  .hist .row2 .item-strip .pill{
+    background:#F1F5F9; color:var(--text);
+    padding:3px 8px; border-radius:99px; font-size:10px; font-weight:600;
+    white-space:nowrap; flex-shrink:0;
+  }
+  .hist .row2 .more-cnt{
+    background:#0F172A; color:#fff;
+    padding:3px 7px; border-radius:99px; font-size:10px; font-weight:700;
+    flex-shrink:0;
+  }
+  .hist .row2 .arrow{margin-left:auto; color:var(--muted-2)}
+
+  /* ===== Empty state hint ===== */
+  .empty{
+    text-align:center; padding:60px 24px;
+    color:var(--muted);
+  }
+  .empty .ico{font-size:42px; margin-bottom:12px}
+  .empty .t1{font-size:14px; font-weight:700; color:var(--text); margin-bottom:4px}
+  .empty .t2{font-size:12px}
+</style>
+</head>
+<body>
+
+<div class="device">
+
+  <!-- Status bar -->
+  <div class="statusbar">
+    <span>9:41</span>
+    <div class="right">
+      <div class="bars"><span></span><span></span><span></span><span></span></div>
+      <div class="battery"><i></i></div>
+    </div>
+  </div>
+  <div class="island"></div>
+
+  <!-- Top bar -->
+  <div class="topbar">
+    <h1>기록</h1>
+    <div class="right">
+      <div class="icon" title="검색">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+      </div>
+      <div class="icon" title="필터">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scroll body -->
+  <div class="scroll" id="scroll">
+
+    <!-- Period summary -->
+    <div class="summary">
+      <div class="label">2026년 5월 · 실 구매 합계</div>
+      <div class="row">
+        <div class="total tnum">156,200<span class="won">원</span></div>
+        <div class="trend">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          전월 대비 −8%
+        </div>
+      </div>
+      <div class="stats">
+        <div class="col"><div class="v">5</div><div class="u">장보기 횟수</div></div>
+        <div class="col"><div class="v">31,240</div><div class="u">평균 객단가 (원)</div></div>
+        <div class="col"><div class="v accent">12,400</div><div class="u">절약액 (원)</div></div>
+      </div>
+    </div>
+
+    <!-- Filter chips -->
+    <div class="filters" id="filters">
+      <div class="filter-chip active" data-f="all">전체 <span class="cnt">12</span></div>
+      <div class="filter-chip" data-f="month">이번 달 <span class="cnt">5</span></div>
+      <div class="filter-chip" data-f="lastmonth">지난 달 <span class="cnt">4</span></div>
+      <div class="filter-chip" data-f="reached">임계치 도달 <span class="cnt">9</span></div>
+      <div class="filter-chip" data-f="emart">이마트 <span class="cnt">6</span></div>
+      <div class="filter-chip" data-f="costco">코스트코 <span class="cnt">3</span></div>
+    </div>
+
+    <!-- 5월 -->
+    <div class="date-group"><span class="month">5월</span><span class="sub">3건 · 81,000원</span></div>
+    <div class="hist-list">
+
+      <div class="hist reached" data-mart="emart">
+        <div class="row1">
+          <div class="ic">🛒</div>
+          <div class="info">
+            <div class="mart">
+              이마트 트레이더스
+              <span class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg>도달</span>
+            </div>
+            <div class="meta">5월 25일 (월) 19:42 · 8개 항목 · 12분 소요</div>
+          </div>
+          <div class="price">
+            <div class="total">45,200원</div>
+            <span class="saved">−4,800원</span>
+          </div>
+        </div>
+        <div class="row2">
+          <div class="item-strip">
+            <span class="pill">서울우유 1L</span>
+            <span class="pill">신라면 5개입</span>
+            <span class="pill">사과 5입</span>
+          </div>
+          <span class="more-cnt">+5</span>
+          <span class="arrow">›</span>
+        </div>
+      </div>
+
+      <div class="hist reached" data-mart="costco">
+        <div class="row1">
+          <div class="ic">🛍️</div>
+          <div class="info">
+            <div class="mart">
+              코스트코
+              <span class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg>도달</span>
+            </div>
+            <div class="meta">5월 20일 (수) 14:18 · 15개 항목 · 28분 소요</div>
+          </div>
+          <div class="price">
+            <div class="total">87,600원</div>
+            <span class="saved">−6,200원</span>
+          </div>
+        </div>
+        <div class="row2">
+          <div class="item-strip">
+            <span class="pill">커클랜드 생수</span>
+            <span class="pill">치킨 통구이</span>
+            <span class="pill">아보카도 5입</span>
+          </div>
+          <span class="more-cnt">+12</span>
+          <span class="arrow">›</span>
+        </div>
+      </div>
+
+      <div class="hist" data-mart="homeplus">
+        <div class="row1">
+          <div class="ic">🏬</div>
+          <div class="info">
+            <div class="mart">홈플러스</div>
+            <div class="meta">5월 14일 (목) 20:05 · 4개 항목 · 6분 소요</div>
+          </div>
+          <div class="price">
+            <div class="total">23,400원</div>
+          </div>
+        </div>
+        <div class="row2">
+          <div class="item-strip">
+            <span class="pill">생수 2L×6</span>
+            <span class="pill">두루마리 휴지</span>
+          </div>
+          <span class="more-cnt">+2</span>
+          <span class="arrow">›</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- 4월 -->
+    <div class="date-group"><span class="month">4월</span><span class="sub">4건 · 142,800원</span></div>
+    <div class="hist-list">
+
+      <div class="hist reached" data-mart="emart">
+        <div class="row1">
+          <div class="ic">🛒</div>
+          <div class="info">
+            <div class="mart">
+              이마트 트레이더스
+              <span class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg>도달</span>
+            </div>
+            <div class="meta">4월 28일 (월) 18:30 · 9개 항목 · 14분 소요</div>
+          </div>
+          <div class="price">
+            <div class="total">52,100원</div>
+            <span class="saved">−3,900원</span>
+          </div>
+        </div>
+        <div class="row2">
+          <div class="item-strip">
+            <span class="pill">햇반 12입</span>
+            <span class="pill">계란 30구</span>
+          </div>
+          <span class="more-cnt">+7</span>
+          <span class="arrow">›</span>
+        </div>
+      </div>
+
+      <div class="hist reached" data-mart="emart">
+        <div class="row1">
+          <div class="ic">🛒</div>
+          <div class="info">
+            <div class="mart">
+              이마트
+              <span class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg>도달</span>
+            </div>
+            <div class="meta">4월 19일 (토) 11:22 · 11개 항목 · 22분 소요</div>
+          </div>
+          <div class="price">
+            <div class="total">38,400원</div>
+            <span class="saved">−2,800원</span>
+          </div>
+        </div>
+        <div class="row2">
+          <div class="item-strip">
+            <span class="pill">고등어 2팩</span>
+            <span class="pill">감자 1kg</span>
+            <span class="pill">대파 1단</span>
+          </div>
+          <span class="more-cnt">+8</span>
+          <span class="arrow">›</span>
+        </div>
+      </div>
+
+      <div class="hist" data-mart="costco">
+        <div class="row1">
+          <div class="ic">🛍️</div>
+          <div class="info">
+            <div class="mart">코스트코</div>
+            <div class="meta">4월 12일 (토) 13:40 · 6개 항목 · 18분 소요</div>
+          </div>
+          <div class="price">
+            <div class="total">29,800원</div>
+          </div>
+        </div>
+        <div class="row2">
+          <div class="item-strip">
+            <span class="pill">크루아상 12입</span>
+            <span class="pill">연어 슬라이스</span>
+          </div>
+          <span class="more-cnt">+4</span>
+          <span class="arrow">›</span>
+        </div>
+      </div>
+
+      <div class="hist reached" data-mart="homeplus">
+        <div class="row1">
+          <div class="ic">🏬</div>
+          <div class="info">
+            <div class="mart">
+              홈플러스
+              <span class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"/></svg>도달</span>
+            </div>
+            <div class="meta">4월 5일 (토) 10:15 · 7개 항목 · 11분 소요</div>
+          </div>
+          <div class="price">
+            <div class="total">22,500원</div>
+            <span class="saved">−1,500원</span>
+          </div>
+        </div>
+        <div class="row2">
+          <div class="item-strip">
+            <span class="pill">백설 설탕</span>
+            <span class="pill">샘표 진간장</span>
+          </div>
+          <span class="more-cnt">+5</span>
+          <span class="arrow">›</span>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="empty" id="emptyState" style="display:none">
+      <div class="ico">📭</div>
+      <div class="t1">해당 조건의 기록이 없어요</div>
+      <div class="t2">다른 필터를 선택해 보세요</div>
+    </div>
+
+  </div>
+
+  <!-- Bottom tab bar -->
+  <div class="tabbar">
+    <a class="tab" href="home.html">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3 2 12h3v8h5v-6h4v6h5v-8h3z"/></svg>
+      <span class="lbl">홈</span>
+    </a>
+    <a class="tab active" href="history.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3" stroke-linecap="round"/></svg>
+      <span class="lbl">기록</span>
+    </a>
+    <a class="tab" href="stats.html">
+      <svg viewBox="0 0 24 24" fill="currentColor"><rect x="4" y="12" width="4" height="9" rx="1"/><rect x="10" y="6" width="4" height="15" rx="1"/><rect x="16" y="9" width="4" height="12" rx="1"/></svg>
+      <span class="lbl">통계</span>
+    </a>
+    <a class="tab" href="settings.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h0a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h0a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v0a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      <span class="lbl">설정</span>
+    </a>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"><span id="toastMsg">메시지</span></div>
+
+  <div class="home-indicator"></div>
+</div>
+
+<div class="caption">필터 칩 탭으로 분류 · 카드 탭 → 상세 (읽기 전용) · <a href="home.html">홈</a></div>
+
+<script>
+  // Filter chips
+  const filters = document.getElementById('filters');
+  filters.addEventListener('click', e => {
+    const chip = e.target.closest('.filter-chip');
+    if (!chip) return;
+    filters.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+    chip.classList.add('active');
+    applyFilter(chip.dataset.f);
+  });
+
+  function applyFilter(f){
+    let visibleCount = 0;
+    document.querySelectorAll('.hist').forEach(h => {
+      let show = true;
+      if (f === 'reached') show = h.classList.contains('reached');
+      else if (f === 'emart') show = h.dataset.mart === 'emart';
+      else if (f === 'costco') show = h.dataset.mart === 'costco';
+      else if (f === 'month') show = h.closest('.hist-list')?.previousElementSibling?.querySelector('.month')?.textContent === '5월';
+      else if (f === 'lastmonth') show = h.closest('.hist-list')?.previousElementSibling?.querySelector('.month')?.textContent === '4월';
+      h.style.display = show ? '' : 'none';
+      if (show) visibleCount++;
+    });
+    // Hide date groups whose list becomes empty
+    document.querySelectorAll('.hist-list').forEach(list => {
+      const anyVisible = [...list.querySelectorAll('.hist')].some(h => h.style.display !== 'none');
+      list.style.display = anyVisible ? '' : 'none';
+      const dg = list.previousElementSibling;
+      if (dg && dg.classList.contains('date-group')) dg.style.display = anyVisible ? '' : 'none';
+    });
+    document.getElementById('emptyState').style.display = visibleCount === 0 ? 'block' : 'none';
+  }
+
+  // Cart tap → toast (would be CartDetail read-only)
+  document.querySelectorAll('.hist').forEach(h => {
+    h.addEventListener('click', () => {
+      const mart = h.querySelector('.mart').firstChild.textContent.trim();
+      const total = h.querySelector('.total').textContent;
+      toast(`${mart} · ${total} (읽기 전용 상세 미구현)`);
+    });
+  });
+
+  let toastTimer;
+  function toast(msg){
+    const t = document.getElementById('toast');
+    document.getElementById('toastMsg').textContent = msg;
+    t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(()=> t.classList.remove('show'), 2400);
+  }
+</script>
+</body>
+</html>
