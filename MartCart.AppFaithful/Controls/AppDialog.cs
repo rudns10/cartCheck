@@ -1,3 +1,5 @@
+using CommunityToolkit.Maui;
+using CommunityToolkit.Maui.Core;
 using CommunityToolkit.Maui.Extensions;
 using CommunityToolkit.Maui.Views;
 using Microsoft.Maui.Controls.Shapes;
@@ -6,26 +8,40 @@ namespace MartCart.AppFaithful.Controls;
 
 public static class AppDialog
 {
-    public static Task<bool> AlertAsync(string title, string message, string ok = "확인", string? cancel = null)
-        => ShowAsync<bool>(page => new ConfirmPopup(title, message, ok, cancel), page: null);
+    public static async Task<bool> AlertAsync(string title, string message, string ok = "확인", string? cancel = null)
+    {
+        var page = GetCurrentPage();
+        if (page is null) return default;
+        var popup = new ConfirmPopup(title, message, ok, cancel);
+        var result = await page.ShowPopupAsync<bool>(popup, BuildOptions());
+        return result.Result;
+    }
 
-    public static Task<string?> PromptAsync(string title, string message, string? initial = null,
+    public static async Task<string?> PromptAsync(string title, string message, string? initial = null,
         string placeholder = "", string ok = "저장", string cancel = "취소",
         Keyboard? keyboard = null, int maxLength = 100)
-        => ShowAsync<string?>(page => new PromptPopup(title, message, initial, placeholder, ok, cancel, keyboard ?? Keyboard.Default, maxLength), page: null);
-
-    public static Task<string?> ChoiceAsync(string title, IReadOnlyList<string> options, string cancel = "취소", string? destructive = null)
-        => ShowAsync<string?>(page => new ChoicePopup(title, options, cancel, destructive), page: null);
-
-    private static async Task<T> ShowAsync<T>(Func<Page, Popup> factory, Page? page)
     {
-        page ??= GetCurrentPage();
-        if (page is null) return default!;
-        var popup = factory(page);
-        var result = await page.ShowPopupAsync(popup);
-        if (result is T t) return t;
-        return default!;
+        var page = GetCurrentPage();
+        if (page is null) return null;
+        var popup = new PromptPopup(title, message, initial, placeholder, ok, cancel, keyboard ?? Keyboard.Default, maxLength);
+        var result = await page.ShowPopupAsync<string?>(popup, BuildOptions());
+        return result.Result;
     }
+
+    public static async Task<string?> ChoiceAsync(string title, IReadOnlyList<string> options, string cancel = "취소", string? destructive = null)
+    {
+        var page = GetCurrentPage();
+        if (page is null) return null;
+        var popup = new ChoicePopup(title, options, cancel, destructive);
+        var result = await page.ShowPopupAsync<string?>(popup, BuildOptions());
+        return result.Result;
+    }
+
+    private static PopupOptions BuildOptions() => new()
+    {
+        PageOverlayColor = Color.FromArgb("#99000000"),
+        CanBeDismissedByTappingOutsideOfPopup = true,
+    };
 
     private static Page? GetCurrentPage()
     {
@@ -37,20 +53,14 @@ public static class AppDialog
     }
 
     // ====================================================================
-    // Base styled popup
+    // Base styled popup helpers (non-generic)
     // ====================================================================
-    private abstract class BasePopup : Popup
+    private static class Styles
     {
-        protected BasePopup()
-        {
-            Color = Colors.Transparent;
-            CanBeDismissedByTappingOutsideOfPopup = true;
-        }
-
-        protected static Color Res(string key)
+        public static Color Res(string key)
             => Application.Current!.Resources.TryGetValue(key, out var v) && v is Color c ? c : Colors.Gray;
 
-        protected Border BuildCard(View content)
+        public static Border BuildCard(View content)
         {
             return new Border
             {
@@ -64,7 +74,7 @@ public static class AppDialog
             };
         }
 
-        protected static Label TitleLabel(string text) => new()
+        public static Label TitleLabel(string text) => new()
         {
             Text = text,
             FontSize = 17,
@@ -72,7 +82,7 @@ public static class AppDialog
             TextColor = Res("TextColor"),
         };
 
-        protected static Label BodyLabel(string text) => new()
+        public static Label BodyLabel(string text) => new()
         {
             Text = text,
             FontSize = 13,
@@ -80,25 +90,19 @@ public static class AppDialog
             LineHeight = 1.45,
         };
 
-        protected Border PrimaryButton(string text, EventHandler<TappedEventArgs> tapped)
+        public static Border PrimaryButton(string text, EventHandler<TappedEventArgs> tapped)
         {
             var label = new Label
             {
-                Text = text,
-                FontSize = 14,
-                FontAttributes = FontAttributes.Bold,
-                TextColor = Colors.White,
-                HorizontalOptions = LayoutOptions.Center,
-                VerticalOptions = LayoutOptions.Center,
-                InputTransparent = true,
+                Text = text, FontSize = 14, FontAttributes = FontAttributes.Bold, TextColor = Colors.White,
+                HorizontalOptions = LayoutOptions.Center, VerticalOptions = LayoutOptions.Center, InputTransparent = true,
             };
             var border = new Border
             {
                 Background = (Brush)Application.Current!.Resources["PrimaryBrush"],
                 Stroke = Colors.Transparent,
                 StrokeShape = new RoundRectangle { CornerRadius = new CornerRadius(12) },
-                HeightRequest = 46,
-                Content = label,
+                HeightRequest = 46, Content = label,
             };
             var tap = new TapGestureRecognizer();
             tap.Tapped += tapped;
@@ -106,25 +110,19 @@ public static class AppDialog
             return border;
         }
 
-        protected Border DestructiveButton(string text, EventHandler<TappedEventArgs> tapped)
+        public static Border DestructiveButton(string text, EventHandler<TappedEventArgs> tapped)
         {
             var label = new Label
             {
-                Text = text,
-                FontSize = 14,
-                FontAttributes = FontAttributes.Bold,
-                TextColor = Colors.White,
-                HorizontalOptions = LayoutOptions.Center,
-                VerticalOptions = LayoutOptions.Center,
-                InputTransparent = true,
+                Text = text, FontSize = 14, FontAttributes = FontAttributes.Bold, TextColor = Colors.White,
+                HorizontalOptions = LayoutOptions.Center, VerticalOptions = LayoutOptions.Center, InputTransparent = true,
             };
             var border = new Border
             {
                 Background = new SolidColorBrush(Res("DangerColor")),
                 Stroke = Colors.Transparent,
                 StrokeShape = new RoundRectangle { CornerRadius = new CornerRadius(12) },
-                HeightRequest = 46,
-                Content = label,
+                HeightRequest = 46, Content = label,
             };
             var tap = new TapGestureRecognizer();
             tap.Tapped += tapped;
@@ -132,25 +130,19 @@ public static class AppDialog
             return border;
         }
 
-        protected Border SecondaryButton(string text, EventHandler<TappedEventArgs> tapped)
+        public static Border SecondaryButton(string text, EventHandler<TappedEventArgs> tapped)
         {
             var label = new Label
             {
-                Text = text,
-                FontSize = 14,
-                FontAttributes = FontAttributes.Bold,
-                TextColor = Res("TextColor"),
-                HorizontalOptions = LayoutOptions.Center,
-                VerticalOptions = LayoutOptions.Center,
-                InputTransparent = true,
+                Text = text, FontSize = 14, FontAttributes = FontAttributes.Bold, TextColor = Res("TextColor"),
+                HorizontalOptions = LayoutOptions.Center, VerticalOptions = LayoutOptions.Center, InputTransparent = true,
             };
             var border = new Border
             {
                 Background = new SolidColorBrush(Res("DividerSoftColor")),
                 Stroke = Colors.Transparent,
                 StrokeShape = new RoundRectangle { CornerRadius = new CornerRadius(12) },
-                HeightRequest = 46,
-                Content = label,
+                HeightRequest = 46, Content = label,
             };
             var tap = new TapGestureRecognizer();
             tap.Tapped += tapped;
@@ -162,41 +154,41 @@ public static class AppDialog
     // ====================================================================
     // Confirm popup
     // ====================================================================
-    private sealed class ConfirmPopup : BasePopup
+    private sealed class ConfirmPopup : Popup<bool>
     {
         public ConfirmPopup(string title, string message, string ok, string? cancel)
         {
             var stack = new VerticalStackLayout { Spacing = 10 };
-            stack.Children.Add(TitleLabel(title));
-            if (!string.IsNullOrEmpty(message)) stack.Children.Add(BodyLabel(message));
+            stack.Children.Add(Styles.TitleLabel(title));
+            if (!string.IsNullOrEmpty(message)) stack.Children.Add(Styles.BodyLabel(message));
 
             var buttons = new Grid { ColumnSpacing = 10, Margin = new Thickness(0, 16, 0, 0) };
             if (cancel is not null)
             {
                 buttons.ColumnDefinitions = new ColumnDefinitionCollection { new(GridLength.Star), new(GridLength.Star) };
-                var cancelBtn = SecondaryButton(cancel, (_, _) => CloseAsync(false));
+                var cancelBtn = Styles.SecondaryButton(cancel, async (_, _) => await CloseAsync(false));
                 Grid.SetColumn(cancelBtn, 0);
                 buttons.Children.Add(cancelBtn);
-                var okBtn = PrimaryButton(ok, (_, _) => CloseAsync(true));
+                var okBtn = Styles.PrimaryButton(ok, async (_, _) => await CloseAsync(true));
                 Grid.SetColumn(okBtn, 1);
                 buttons.Children.Add(okBtn);
             }
             else
             {
                 buttons.ColumnDefinitions = new ColumnDefinitionCollection { new(GridLength.Star) };
-                var okBtn = PrimaryButton(ok, (_, _) => CloseAsync(true));
+                var okBtn = Styles.PrimaryButton(ok, async (_, _) => await CloseAsync(true));
                 Grid.SetColumn(okBtn, 0);
                 buttons.Children.Add(okBtn);
             }
             stack.Children.Add(buttons);
-            Content = BuildCard(stack);
+            Content = Styles.BuildCard(stack);
         }
     }
 
     // ====================================================================
     // Prompt popup
     // ====================================================================
-    private sealed class PromptPopup : BasePopup
+    private sealed class PromptPopup : Popup<string?>
     {
         public PromptPopup(string title, string message, string? initial, string placeholder, string ok, string cancel, Keyboard keyboard, int maxLength)
         {
@@ -207,13 +199,13 @@ public static class AppDialog
                 Keyboard = keyboard,
                 MaxLength = maxLength,
                 FontSize = 16,
-                TextColor = Res("TextColor"),
-                PlaceholderColor = Res("Muted2Color"),
+                TextColor = Styles.Res("TextColor"),
+                PlaceholderColor = Styles.Res("Muted2Color"),
                 BackgroundColor = Colors.Transparent,
             };
             var inputBorder = new Border
             {
-                Background = new SolidColorBrush(Res("DividerSoftColor")),
+                Background = new SolidColorBrush(Styles.Res("DividerSoftColor")),
                 Stroke = Colors.Transparent,
                 StrokeShape = new RoundRectangle { CornerRadius = new CornerRadius(10) },
                 Padding = new Thickness(12, 4),
@@ -221,8 +213,8 @@ public static class AppDialog
             };
 
             var stack = new VerticalStackLayout { Spacing = 10 };
-            stack.Children.Add(TitleLabel(title));
-            if (!string.IsNullOrEmpty(message)) stack.Children.Add(BodyLabel(message));
+            stack.Children.Add(Styles.TitleLabel(title));
+            if (!string.IsNullOrEmpty(message)) stack.Children.Add(Styles.BodyLabel(message));
             stack.Children.Add(inputBorder);
 
             var buttons = new Grid
@@ -231,45 +223,47 @@ public static class AppDialog
                 Margin = new Thickness(0, 14, 0, 0),
                 ColumnDefinitions = new ColumnDefinitionCollection { new(GridLength.Star), new(GridLength.Star) },
             };
-            var cancelBtn = SecondaryButton(cancel, (_, _) => CloseAsync((string?)null));
+            var cancelBtn = Styles.SecondaryButton(cancel, async (_, _) => await CloseAsync((string?)null));
             Grid.SetColumn(cancelBtn, 0);
             buttons.Children.Add(cancelBtn);
-            var okBtn = PrimaryButton(ok, (_, _) => CloseAsync(entry.Text ?? ""));
+            var okBtn = Styles.PrimaryButton(ok, async (_, _) => await CloseAsync(entry.Text ?? ""));
             Grid.SetColumn(okBtn, 1);
             buttons.Children.Add(okBtn);
             stack.Children.Add(buttons);
 
-            entry.Completed += (_, _) => CloseAsync(entry.Text ?? "");
+            entry.Completed += async (_, _) => await CloseAsync(entry.Text ?? "");
 
-            Content = BuildCard(stack);
+            Content = Styles.BuildCard(stack);
         }
     }
 
     // ====================================================================
-    // Choice popup (action sheet replacement)
+    // Choice popup
     // ====================================================================
-    private sealed class ChoicePopup : BasePopup
+    private sealed class ChoicePopup : Popup<string?>
     {
         public ChoicePopup(string title, IReadOnlyList<string> options, string cancel, string? destructive)
         {
             var stack = new VerticalStackLayout { Spacing = 8 };
-            stack.Children.Add(TitleLabel(title));
+            stack.Children.Add(Styles.TitleLabel(title));
 
             foreach (var opt in options)
             {
-                var row = SecondaryButton(opt, (_, _) => CloseAsync((string?)opt));
+                var captured = opt;
+                var row = Styles.SecondaryButton(opt, async (_, _) => await CloseAsync((string?)captured));
                 stack.Children.Add(row);
             }
             if (!string.IsNullOrEmpty(destructive))
             {
-                var row = DestructiveButton(destructive, (_, _) => CloseAsync((string?)destructive));
+                var captured = destructive;
+                var row = Styles.DestructiveButton(destructive, async (_, _) => await CloseAsync((string?)captured));
                 stack.Children.Add(row);
             }
-            var cancelBtn = SecondaryButton(cancel, (_, _) => CloseAsync((string?)null));
+            var cancelBtn = Styles.SecondaryButton(cancel, async (_, _) => await CloseAsync((string?)null));
             cancelBtn.Margin = new Thickness(0, 6, 0, 0);
             stack.Children.Add(cancelBtn);
 
-            Content = BuildCard(stack);
+            Content = Styles.BuildCard(stack);
         }
     }
 }

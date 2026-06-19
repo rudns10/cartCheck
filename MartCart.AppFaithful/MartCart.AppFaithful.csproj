@@ -1,8 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFrameworks>net9.0-android;net9.0-ios;net9.0-maccatalyst</TargetFrameworks>
-		<TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">$(TargetFrameworks);net9.0-windows10.0.19041.0</TargetFrameworks>
+		<TargetFrameworks>net10.0-android;net10.0-ios;net10.0-maccatalyst</TargetFrameworks>
+		<TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">$(TargetFrameworks);net10.0-windows10.0.19041.0</TargetFrameworks>
 
 		<OutputType>Exe</OutputType>
 		<RootNamespace>MartCart.AppFaithful</RootNamespace>
@@ -13,8 +13,8 @@
 
 		<ApplicationTitle>CartCheck</ApplicationTitle>
 		<ApplicationId>com.ssof.cartcheck</ApplicationId>
-		<ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
-		<ApplicationVersion>1</ApplicationVersion>
+		<ApplicationDisplayVersion>1.0.11</ApplicationDisplayVersion>
+		<ApplicationVersion>12</ApplicationVersion>
 		<WindowsPackageType>None</WindowsPackageType>
 
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">15.0</SupportedOSPlatformVersion>
@@ -28,16 +28,7 @@
 		<NoWarn>$(NoWarn);AMM0000;XA0141</NoWarn>
 	</PropertyGroup>
 
-	<!-- ===== Android release signing =====
-	     암호는 csproj에 박지 않고 환경변수 또는 dotnet publish 명령줄 인자로 전달:
-	         $env:CARTCHECK_KEYSTORE_PASS = "..."
-	         dotnet publish -f net9.0-android -c Release `
-	             -p:AndroidKeyStore=true `
-	             -p:AndroidSigningKeyStore=c:\Dev2026\cartcheck-release.keystore `
-	             -p:AndroidSigningKeyAlias=cartcheck `
-	             -p:AndroidSigningKeyPass=$env:CARTCHECK_KEYSTORE_PASS `
-	             -p:AndroidSigningStorePass=$env:CARTCHECK_KEYSTORE_PASS
-	-->
+	<!-- ===== Android release signing ===== -->
 	<PropertyGroup Condition="'$(Configuration)' == 'Release' and $([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">
 		<AndroidKeyStore>true</AndroidKeyStore>
 		<AndroidSigningKeyStore>c:\Dev2026\cartcheck-release.keystore</AndroidSigningKeyStore>
@@ -55,18 +46,21 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="CommunityToolkit.Maui" Version="11.2.0" />
-		<PackageReference Include="CommunityToolkit.Maui.Camera" Version="2.0.1" />
+		<PackageReference Include="CommunityToolkit.Maui" Version="14.2.0" />
+		<PackageReference Include="CommunityToolkit.Maui.Camera" Version="6.1.0" />
 		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
-		<PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
-		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.0" />
-		<PackageReference Include="Plugin.Fingerprint" Version="2.1.5" />
+		<PackageReference Include="Microsoft.Maui.Controls" Version="10.0.70" />
+		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="10.0.0" />
+		<PackageReference Include="Plugin.Fingerprint" Version="3.0.0-beta.1" />
 	</ItemGroup>
 
 	<ItemGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">
 		<PackageReference Include="Xamarin.GooglePlayServices.MLKit.Text.Recognition.Korean" Version="116.0.1.7" />
-		<PackageReference Include="Xamarin.AndroidX.SavedState" Version="1.4.0.2" />
-		<PackageReference Include="Xamarin.AndroidX.SavedState.SavedState.Ktx" Version="1.4.0.2" ExcludeAssets="all" PrivateAssets="all" />
+		<PackageReference Include="Xamarin.AndroidX.SavedState" Version="1.5.0" />
+		<PackageReference Include="Xamarin.AndroidX.SavedState.SavedState.Ktx" Version="1.5.0" ExcludeAssets="all" PrivateAssets="all" />
+		<!-- 패키지 충돌 해결: CommunityToolkit.Maui.Camera 6.1의 trans dependency 충돌 -->
+		<PackageReference Include="Xamarin.AndroidX.Activity" Version="1.12.4.1" />
+		<PackageReference Include="Xamarin.AndroidX.Activity.Ktx" Version="1.12.4.1" ExcludeAssets="all" PrivateAssets="all" />
 	</ItemGroup>
 
 	<ItemGroup>
